@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Medicine</string>
+
+    <!-- Read aloud by a screen reader -->
+    <string name="cd_back">Back</string>
+    <string name="cd_about">About</string>
+    <string name="cd_settings">Settings</string>
+    <string name="cd_remove_time">Remove this time</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="save">Save</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="tomorrow">Tomorrow</string>
+
+    <!-- The three tabs under the top bar -->
+    <string name="tab_today">Today</string>
+    <string name="tab_medicines">Medicines</string>
+    <string name="tab_log">Log</string>
+
+    <!-- ============================================================ -->
+    <!-- Today -->
+
+    <string name="today_empty">No medicines yet. Add one, with the times it is taken, and a reminder rings at each.</string>
+    <string name="add_medicine">Add a medicine</string>
+    <!-- Over doses from the last two days that nobody marked taken or skipped -->
+    <string name="today_earlier">Not marked</string>
+    <!-- %1$s is today's date, e.g. "Tue 6 Oct" -->
+    <string name="today_heading">Today, %1$s</string>
+    <string name="today_none">Nothing is due today.</string>
+    <!-- %1$s is when, e.g. "Tomorrow 08:00"; %2$s the medicine -->
+    <string name="today_next">Next: %1$s, %2$s</string>
+    <string name="today_as_needed">When needed</string>
+    <!-- %1$s is when, e.g. "Yesterday 14:20" -->
+    <string name="last_taken">Last taken %1$s</string>
+    <string name="never_taken">Not taken yet</string>
+    <string name="take_now">Taken now</string>
+
+    <!-- What became of a dose -->
+    <string name="status_later">Later</string>
+    <!-- %1$s is when it was taken -->
+    <string name="status_taken_at">Taken %1$s</string>
+    <string name="status_taken_as_needed">Taken</string>
+    <string name="status_skipped">Skipped</string>
+    <string name="status_not_marked">Not marked</string>
+    <!-- The app could not ring for it: it was stopped, or the phone was off -->
+    <string name="status_not_marked_no_reminder">Not marked · no reminder rang</string>
+    <!-- %1$s is when the reminder rang, well after the dose was due -->
+    <string name="status_not_marked_late">Not marked · the reminder rang late, %1$s</string>
+    <!-- %1$s is a time -->
+    <string name="status_rings_again">Not marked · rings again at %1$s</string>
+
+    <!-- A dose pressed -->
+    <!-- %1$s is when, e.g. "08:00" or "Yesterday 20:00" -->
+    <string name="due_at">Due %1$s</string>
+    <string name="take_early">Taken now, before its time</string>
+    <!-- %1$s is the time it was due -->
+    <string name="taken_then">Taken at %1$s</string>
+    <string name="taken_now">Taken just now</string>
+    <string name="unmark">Not marked after all</string>
+    <string name="mark_skipped">Skipped after all</string>
+    <string name="remove_from_log">Take out of the log</string>
+    <string name="open_medicine">Open the medicine</string>
+
+    <!-- ============================================================ -->
+    <!-- Setup: only shown while something stands between a reminder and the person -->
+
+    <string name="setup_duraspeed">One step so reminders ring: the phone\'s DuraSpeed setting can shut Medicine down, and its reminders with it. Open DuraSpeed, tap Open, and switch Medicine on.</string>
+    <string name="setup_duraspeed_open">Open DuraSpeed</string>
+    <string name="setup_duraspeed_done">It\'s switched on</string>
+    <string name="setup_notifications">Notifications are off for Medicine, so reminders cannot show.</string>
+    <string name="setup_turn_on">Turn them on</string>
+    <string name="setup_exact">Medicine is not allowed to set alarms, so a reminder can come up to an hour late.</string>
+    <string name="setup_allow">Allow alarms</string>
+    <!-- %1$s is when, e.g. "14:02" or "Yesterday 14:02" -->
+    <string name="setup_stopped">Medicine was stopped (%1$s), and no reminder could ring until it was opened again. Anything due in that time is in the log as not marked.</string>
+    <string name="setup_understood">Understood</string>
+    <string name="setup_cannot_open">This phone has no settings page for that.</string>
+
+    <!-- ============================================================ -->
+    <!-- Medicines -->
+
+    <string name="when_needed">When needed</string>
+    <!-- %1$s is a list of times -->
+    <string name="summary_every_day">Every day at %1$s</string>
+    <!-- %1$s is a list of days, %2$s a list of times -->
+    <string name="summary_on_days">%1$s at %2$s</string>
+    <!-- %1$s is a number of days, %2$s a list of times -->
+    <string name="summary_every_n_days">Every %1$s days at %2$s</string>
+    <!-- %1$s is a number of hours, %2$s the first dose's time -->
+    <string name="summary_every_hours">Every %1$s hours, from %2$s</string>
+    <!-- %1$s is the schedule -->
+    <string name="paused_then">Paused · %1$s</string>
+    <!-- %1$s is what is left, e.g. "5 left · about 2 days" -->
+    <string name="refill_soon">Refill soon · %1$s</string>
+    <plurals name="left">
+        <item quantity="one">%1$s left</item>
+        <item quantity="other">%1$s left</item>
+    </plurals>
+    <plurals name="about_days">
+        <item quantity="one">about %1$s day</item>
+        <item quantity="other">about %1$s days</item>
+    </plurals>
+
+    <!-- ============================================================ -->
+    <!-- A medicine's page -->
+
+    <string name="edit_new_title">New medicine</string>
+    <string name="edit_name">Name</string>
+    <string name="edit_name_hint">As on the box</string>
+    <string name="edit_amount">How much</string>
+    <string name="edit_amount_hint">1 tablet, 5 ml, 500 mg</string>
+    <string name="edit_when">When</string>
+    <string name="edit_kind_times">At set times</string>
+    <string name="edit_kind_hours">Every few hours</string>
+    <string name="edit_kind_needed">Only when needed</string>
+    <string name="edit_times">Times</string>
+    <string name="edit_add_time">Add a time</string>
+    <string name="edit_days">Days</string>
+    <string name="edit_days_every">Every day</string>
+    <string name="edit_days_week">On some days of the week</string>
+    <string name="edit_days_every_n">Every few days</string>
+    <string name="edit_every_n">Every how many days</string>
+    <string name="edit_starting">Starting</string>
+    <string name="edit_hours">Every how many hours</string>
+    <string name="edit_first_dose">First dose at</string>
+    <string name="edit_hours_note">Counted on the clock: on the night the clocks change, one gap is an hour longer or shorter.</string>
+    <string name="edit_needed_note">No reminders. Press it on the first screen to write down a dose when it is taken.</string>
+    <string name="edit_supply">What is left</string>
+    <string name="edit_counting">Count what is left</string>
+    <string name="edit_left">Left now</string>
+    <string name="edit_per_dose">Each dose uses</string>
+    <string name="edit_warn_at">Say so when this many are left</string>
+    <string name="edit_warn_hint">Leave empty for never</string>
+    <!-- %1$s is a number of days, %2$s the day they run out -->
+    <plurals name="lasts_about">
+        <item quantity="one">At this schedule that lasts about %1$s day, to %2$s. A guess, not a count.</item>
+        <item quantity="other">At this schedule that lasts about %1$s days, to %2$s. A guess, not a count.</item>
+    </plurals>
+    <string name="refill_to_calendar">Put the refill in the calendar</string>
+    <!-- %1$s is the medicine -->
+    <string name="refill_event_title">Refill %1$s</string>
+    <!-- %1$s is a number, %2$s the day it was counted -->
+    <plurals name="refill_event_text">
+        <item quantity="one">%1$s left on %2$s.</item>
+        <item quantity="other">%1$s left on %2$s.</item>
+    </plurals>
+    <string name="edit_pharmacy">Pharmacy</string>
+    <string name="edit_pharmacy_name">Name</string>
+    <string name="edit_pharmacy_number">Phone number</string>
+    <string name="pharmacy_choose">Choose from Contacts</string>
+    <string name="pharmacy_call">Call</string>
+    <string name="pharmacy_text">Text</string>
+    <string name="pharmacy_open_contact">Open in Contacts</string>
+    <!-- Put into a new text message to the pharmacy; %1$s is the medicine -->
+    <string name="pharmacy_text_body">Refill: %1$s</string>
+    <string name="pharmacy_unreadable">That contact could not be read. Type the name and number instead.</string>
+    <string name="edit_notes">Notes</string>
+    <string name="edit_notes_label">Shown with each reminder</string>
+    <string name="edit_notes_hint">With food, for example</string>
+    <string name="edit_paused">Paused</string>
+    <string name="edit_paused_note">No reminders while it is paused. Nothing is written into the log for that time.</string>
+    <string name="edit_delete">Delete this medicine</string>
+    <string name="edit_delete_armed">Delete — the log keeps its doses; tap again</string>
+    <string name="edit_needs_name">It needs a name.</string>
+    <string name="edit_needs_time">It needs at least one time.</string>
+    <string name="edit_needs_day">It needs at least one day.</string>
+    <string name="edit_needs_every_n">Every how many days needs a number from 1 to 365.</string>
+    <string name="edit_needs_hours">Every how many hours needs a number from 1 to 168.</string>
+    <string name="edit_needs_left">How many are left needs a number.</string>
+    <string name="edit_needs_per_dose">Each dose needs to use at least 1.</string>
+    <string name="edit_back_again">Back again leaves without saving.</string>
+
+    <string name="no_calendar">There is no calendar on this phone to put it in.</string>
+    <string name="no_contacts">There is no contacts app on this phone that can be chosen from.</string>
+    <string name="no_dialer">There is nothing on this phone to call with.</string>
+    <string name="no_messaging">There is nothing on this phone to send a text with.</string>
+
+    <!-- ============================================================ -->
+    <!-- The log -->
+
+    <string name="log_empty">Nothing in the log yet. Doses go in when they come due, and when they are marked.</string>
+    <!-- %1$s doses taken, out of %2$s due -->
+    <string name="log_week">Last 7 days: %1$s of %2$s taken</string>
+    <string name="log_month">Last 30 days: %1$s of %2$s taken</string>
+    <plurals name="log_skipped">
+        <item quantity="one">%1$s skipped</item>
+        <item quantity="other">%1$s skipped</item>
+    </plurals>
+    <plurals name="log_not_marked">
+        <item quantity="one">%1$s not marked</item>
+        <item quantity="other">%1$s not marked</item>
+    </plurals>
+    <plurals name="log_as_needed_week">
+        <item quantity="one">Taken %1$s time in the last 7 days</item>
+        <item quantity="other">Taken %1$s times in the last 7 days</item>
+    </plurals>
+    <string name="log_share">Share as text</string>
+    <string name="log_save_csv">Save as CSV</string>
+    <string name="log_saved">Saved.</string>
+    <string name="log_not_saved">The file could not be written.</string>
+    <!-- The first line of a shared log, and its subject -->
+    <string name="export_title">Medicine log</string>
+
+    <!-- ============================================================ -->
+    <!-- Reminders -->
+
+    <string name="channel_doses">Reminders</string>
+    <string name="channel_doses_about">A medicine coming due</string>
+    <string name="channel_refills">Refills</string>
+    <!-- %1$s is when, e.g. "08:00" or "Yesterday 20:00" -->
+    <string name="notify_due">Due %1$s</string>
+    <!-- On a lock screen set to hide what notifications say -->
+    <string name="notify_public_title">A medicine is due</string>
+    <string name="action_taken">Taken</string>
+    <string name="action_skip">Skip</string>
+    <!-- %1$s is a number of minutes -->
+    <string name="action_snooze">Snooze %1$s min</string>
+    <string name="action_snooze_all">Snooze all, %1$s min</string>
+    <string name="ringing_title">Medicine</string>
+    <string name="ringing_later">Answer later</string>
+    <!-- %1$s is a medicine -->
+    <string name="refill_title">%1$s is running low</string>
+    <plurals name="refill_left">
+        <item quantity="one">%1$s left, by the count.</item>
+        <item quantity="other">%1$s left, by the count.</item>
+    </plurals>
+    <string name="test_title">A test reminder</string>
+    <!-- %1$s is when it was meant to ring, %2$s when it did -->
+    <string name="test_text">Set for %1$s, rang at %2$s. A real reminder rings the same way.</string>
+    <string name="test_screen">This is how a reminder looks when the phone is locked. The buttons on a real one mark the dose.</string>
+
+    <!-- The permission another app asks for to copy the medicine list, as Android shows it -->
+    <string name="permission_read_label">read your medicine list</string>
+    <string name="permission_read_description">Read the names and amounts of the medicines set up in Medicine. Not when they are taken, nor the log.</string>
+
+    <!-- Glance's lock-screen panel; %1$s is the medicine -->
+    <string name="glance_not_marked">%1$s, not marked</string>
+
+    <!-- ============================================================ -->
+    <!-- Settings -->
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_snooze">Snooze for</string>
+    <string name="settings_again">If a dose is not marked</string>
+    <string name="settings_again_never">Ring once only</string>
+    <!-- %1$s is a length of time, e.g. "30 minutes" -->
+    <string name="settings_again_after">Ring again after %1$s, up to 3 times</string>
+    <string name="settings_full_screen">Fill the screen when a reminder rings</string>
+    <string name="settings_sound">Sound and vibration</string>
+    <string name="settings_glance">Next dose on the lock screen</string>
+    <string name="settings_glance_note">Shown by Glance, when it is installed. It names medicines to anyone who picks up the phone.</string>
+    <string name="settings_test">Try a reminder</string>
+    <string name="settings_test_note">It rings in a minute, the way a dose does</string>
+    <!-- %1$s is a time -->
+    <string name="settings_test_set">Rings at %1$s</string>
+    <string name="settings_clear_log">Clear the log</string>
+    <string name="settings_clear_log_armed">Clear — every dose in the log goes; tap again</string>
+    <plurals name="minutes">
+        <item quantity="one">%1$s minute</item>
+        <item quantity="other">%1$s minutes</item>
+    </plurals>
+
+    <!-- ============================================================ -->
+    <!-- About -->
+
+    <!-- %1$s is the version -->
+    <string name="about_title">Medicine %1$s</string>
+    <string name="about_what">Reminders and a log of what was taken. Nothing leaves the phone: the app has no internet permission. It reminds, and does not advise; what to take and when is for a doctor or pharmacist to say.</string>
+    <string name="about_licence">GNU General Public License v3</string>
+    <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
+    <string name="about_feed_the_llamas">feed the llamas</string>
+    <string name="about_no_browser">There is no browser on this phone to open that with.</string>
+    <string name="about_close">Close</string>
+</resources>

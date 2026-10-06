@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- No internet: nothing the app holds can leave the phone through it. -->
+
+    <!-- Reminders that ring at the minute they are due. On Android 12 this is given at install;
+         if it is taken away, the first screen says so and asks for it back. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- An alarm does not survive a restart: this is how they are set again. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- The reminder as a whole screen over the lock screen, with buttons big enough to read. -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <!-- Asked for by Android 13 and later; Android 12, the Kompakt's, has notifications on. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- The medicine list, by name and amount, for another app the person allows: Field Kit's
+         emergency card. Dangerous, so Android asks before any app is given it. See
+         share/MedicineList.kt and "For other apps" in the README. -->
+    <permission
+        android:name="com.wanderwildwood.fukuyaku.permission.READ_MEDICINES"
+        android:label="@string/permission_read_label"
+        android:description="@string/permission_read_description"
+        android:protectionLevel="dangerous" />
+
+    <!-- The other apps that act on selected text, so a field's selection menu can list them
+         behind its ⋮ as every other app of this shop does. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="false"
+        android:theme="@style/Theme.App">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- The reminder over the lock screen. Its own task, out of Recents, so answering it
+             leaves the phone where it was. -->
+        <activity
+            android:name=".alarm.ReminderActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:taskAffinity="com.wanderwildwood.fukuyaku.reminder"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
+        <receiver
+            android:name=".alarm.AlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".alarm.ActionReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".alarm.SystemReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- The next dose for Glance's lock-screen panel; it answers Glance alone, and only
+             while the switch for it in Settings is on. -->
+        <provider
+            android:name=".glance.NextDoseOnLockScreen"
+            android:authorities="com.wanderwildwood.fukuyaku.glance"
+            android:exported="true" />
+
+        <provider
+            android:name=".share.MedicineList"
+            android:authorities="com.wanderwildwood.fukuyaku.medicines"
+            android:exported="true"
+            android:permission="com.wanderwildwood.fukuyaku.permission.READ_MEDICINES" />
+
+    </application>
+
+</manifest>
