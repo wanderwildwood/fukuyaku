@@ -142,6 +142,12 @@ class Store private constructor(context: Context) :
         changed()
     }
 
+    /** Forgets a medicine's doses due after [after] that nobody marked. */
+    fun forgetOpenAfter(medicineId: Long, after: Long) {
+        writableDatabase.delete("dose", "medicine_id = ? AND status = 0 AND due > ?", arrayOf(medicineId.toString(), after.toString()))
+        changed()
+    }
+
     fun dose(id: Long): Dose? =
         readableDatabase.query("dose", null, "id = ?", arrayOf(id.toString()), null, null, null).use { c ->
             if (c.moveToNext()) doseAt(c) else null

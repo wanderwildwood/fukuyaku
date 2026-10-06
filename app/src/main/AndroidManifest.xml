@@ -13,15 +13,6 @@
     <!-- Asked for by Android 13 and later; Android 12, the Kompakt's, has notifications on. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- The medicine list, by name and amount, for another app the person allows: Field Kit's
-         emergency card. Dangerous, so Android asks before any app is given it. See
-         share/MedicineList.kt and "For other apps" in the README. -->
-    <permission
-        android:name="com.wanderwildwood.fukuyaku.permission.READ_MEDICINES"
-        android:label="@string/permission_read_label"
-        android:description="@string/permission_read_description"
-        android:protectionLevel="dangerous" />
-
     <!-- The other apps that act on selected text, so a field's selection menu can list them
          behind its ⋮ as every other app of this shop does. -->
     <queries>
@@ -93,11 +84,20 @@
             android:authorities="com.wanderwildwood.fukuyaku.glance"
             android:exported="true" />
 
-        <provider
-            android:name=".share.MedicineList"
-            android:authorities="com.wanderwildwood.fukuyaku.medicines"
+        <!-- The medicine list, handed to another app that asks for it — Field Kit's emergency
+             card first — only after the person sees it here and presses Share. See
+             share/ShareMedicinesActivity.kt and "For other apps" in the README. -->
+        <activity
+            android:name=".share.ShareMedicinesActivity"
             android:exported="true"
-            android:permission="com.wanderwildwood.fukuyaku.permission.READ_MEDICINES" />
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="com.wanderwildwood.fukuyaku.action.SHARE_MEDICINES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
     </application>
 

@@ -46,7 +46,14 @@ object Reminders {
             // A clock set back (by hand, or by a network that had it wrong) leaves a medicine
             // caught up to a moment that has not come yet, and nothing would ring until it did.
             // Doses already in the log are never written twice, so starting again from now is safe.
-            val m = if (found.caughtUp > now) found.copy(caughtUp = now).also { store.save(it) } else found
+            // Doses the wrong clock wrote into the log and nobody marked are not real yet: left
+            // in place, they would stand in for the real ones and stop them ringing.
+            val m = if (found.caughtUp > now) {
+                store.forgetOpenAfter(found.id, now)
+                found.copy(caughtUp = now).also { store.save(it) }
+            } else {
+                found
+            }
             val caught = Plan.catchUp(m, now, zone)
             for (due in caught.dues) {
                 val dose = Dose(medicineId = m.id, name = m.name, amount = m.amount, due = due)

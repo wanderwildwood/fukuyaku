@@ -233,9 +233,13 @@
     <string name="test_text">Set for %1$s, rang at %2$s. A real reminder rings the same way.</string>
     <string name="test_screen">This is how a reminder looks when the phone is locked. The buttons on a real one mark the dose.</string>
 
-    <!-- The permission another app asks for to copy the medicine list, as Android shows it -->
-    <string name="permission_read_label">read your medicine list</string>
-    <string name="permission_read_description">Read the names and amounts of the medicines set up in Medicine. Not when they are taken, nor the log.</string>
+    <!-- Another app asking for the medicine list. %1$s is that app's name -->
+    <string name="share_title">Share medicines</string>
+    <string name="share_ask">Share these with %1$s?</string>
+    <string name="share_ask_unknown">Share these with the app that asked?</string>
+    <string name="share_none">No medicines are set up, so there is nothing to share.</string>
+    <string name="share_yes">Share</string>
+    <string name="share_no">Don\'t share</string>
 
     <!-- Glance's lock-screen panel; %1$s is the medicine -->
     <string name="glance_not_marked">%1$s, not marked</string>
