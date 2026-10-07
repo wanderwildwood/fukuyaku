@@ -74,8 +74,9 @@ fun LogScreen() {
     val save = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         val all = Store.get(context).all()
+        val doctors = Export.doctorsById(Store.get(context).medicines())
         runCatching {
-            context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(Export.csv(all, zone).toByteArray()) }
+            context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(Export.csv(all, zone, doctors).toByteArray()) }
                 ?: error("no stream")
         }.onSuccess {
             Toast.makeText(context, context.getString(R.string.log_saved), Toast.LENGTH_SHORT).show()
@@ -109,7 +110,8 @@ fun LogScreen() {
             Row(Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
                 OutlinedButtonMMD(
                     onClick = {
-                        val text = Export.text(Store.get(context).all(), zone, Words.export(context))
+                        val store = Store.get(context)
+                        val text = Export.text(store.all(), zone, Words.export(context), Export.doctorLines(store.medicines()))
                         val send = Intent(Intent.ACTION_SEND)
                             .setType("text/plain")
                             .putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.export_title))

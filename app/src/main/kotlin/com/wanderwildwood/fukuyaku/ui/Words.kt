@@ -75,6 +75,7 @@ object Words {
     /** The words a text export is written in. */
     fun export(context: Context): Export.Words = object : Export.Words {
         override fun title() = context.getString(R.string.export_title)
+        override fun doctors() = context.getString(R.string.export_doctors)
         override fun day(date: LocalDate) = Times.day(context, date)
         override fun time(at: Long) = Times.time(context, at)
         override fun line(d: Dose): String = d.label + " — " + when (d.status) {

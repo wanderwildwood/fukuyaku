@@ -166,6 +166,18 @@
         <item quantity="one">Pharmacy set for %1$d medicine</item>
         <item quantity="other">Pharmacy set for %1$d medicines</item>
     </plurals>
+    <!-- Who prescribed a medicine; optional, like the pharmacy -->
+    <string name="edit_doctor">Doctor</string>
+    <!-- Put into a new text message to the doctor; %1$s is the medicine -->
+    <string name="doctor_text_body">About %1$s:</string>
+    <!-- A doctor sent from Contacts: which medicines they prescribed -->
+    <string name="doctor_set_ask">Make this the doctor for the medicines ticked here?</string>
+    <string name="doctor_set_none">No medicines are set up yet. Add one first; its page can choose this doctor from Contacts.</string>
+    <string name="doctor_set_yes">Set doctor</string>
+    <plurals name="doctor_set_done">
+        <item quantity="one">Doctor set for %1$d medicine</item>
+        <item quantity="other">Doctor set for %1$d medicines</item>
+    </plurals>
     <string name="edit_notes">Notes</string>
     <string name="edit_notes_label">Shown with each reminder</string>
     <string name="edit_notes_hint">With food, for example</string>
@@ -212,6 +224,8 @@
     <string name="log_not_saved">The file could not be written.</string>
     <!-- The first line of a shared log, and its subject -->
     <string name="export_title">Medicine log</string>
+    <!-- Heading in the shared log over each medicine's doctor -->
+    <string name="export_doctors">Doctors</string>
 
     <!-- ============================================================ -->
     <!-- Reminders -->

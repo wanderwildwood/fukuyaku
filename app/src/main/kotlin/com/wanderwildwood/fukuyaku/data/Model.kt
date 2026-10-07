@@ -20,6 +20,11 @@ data class Medicine(
     val pharmacyNumber: String = "",
     /** The pharmacy's entry in Contacts, when it was chosen from there. */
     val pharmacyContact: String = "",
+    /** Who prescribed it: optional, like the pharmacy. */
+    val doctorName: String = "",
+    val doctorNumber: String = "",
+    /** The doctor's entry in Contacts, when it was chosen from there. */
+    val doctorContact: String = "",
     val notes: String = "",
     val paused: Boolean = false,
     val caughtUp: Long = 0,
@@ -31,6 +36,9 @@ data class Medicine(
     val label: String get() = if (amount.isBlank()) name else "$name, $amount"
 
     val low: Boolean get() = left != null && warnAt != null && left <= warnAt
+
+    /** The doctor as one short phrase: the name, or the number when there is no name. */
+    val doctor: String get() = doctorName.ifBlank { doctorNumber }
 }
 
 enum class Status(val code: Int) {

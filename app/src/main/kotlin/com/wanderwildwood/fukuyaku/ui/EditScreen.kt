@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +50,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
 import com.wanderwildwood.fukuyaku.alarm.Reminders
+import com.wanderwildwood.fukuyaku.data.Medicine
 import com.wanderwildwood.fukuyaku.data.Plan
 import com.wanderwildwood.fukuyaku.data.Store
 import kotlinx.coroutines.delay
@@ -59,7 +61,7 @@ import java.time.ZoneId
 
 /**
  * A medicine's page, new or existing: its name, when it is taken, what is left of it, its
- * pharmacy, notes. Back saves it, as Save does. When it cannot be saved yet the page says
+ * pharmacy, its doctor, notes. Back saves it, as Save does. When it cannot be saved yet the page says
  * why, and a second Back within four seconds leaves without saving.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,16 +78,16 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
     var pickHoursFrom by remember { mutableStateOf(false) }
     var pickFrom by remember { mutableStateOf(false) }
 
-    // A pharmacy set from Contacts while this page was open underneath comes into the page,
-    // unless the pharmacy here was changed by hand meanwhile, so Back does not undo it.
-    var seen by remember(id) { mutableStateOf(original?.let { Triple(it.pharmacyName, it.pharmacyNumber, it.pharmacyContact) }) }
+    // A pharmacy or doctor set from Contacts while this page was open underneath comes into
+    // the page, unless that one was changed by hand here meanwhile, so Back does not undo it.
+    var seen by remember(id) { mutableStateOf(original?.let { Pharmacy.of(it) to Doctor.of(it) }) }
     LifecycleResumeEffect(id) {
         val fresh = original?.let { store.medicine(it.id) }
-        val now = fresh?.let { Triple(it.pharmacyName, it.pharmacyNumber, it.pharmacyContact) }
-        if (now != null && now != seen) {
-            if (Triple(d.pharmacyName, d.pharmacyNumber, d.pharmacyContact) == seen) {
-                d = d.copy(pharmacyName = now.first, pharmacyNumber = now.second, pharmacyContact = now.third)
-            }
+        val now = fresh?.let { Pharmacy.of(it) to Doctor.of(it) }
+        val was = seen
+        if (now != null && was != null && now != was) {
+            if (now.first != was.first && Pharmacy.of(d) == was.first) d = Pharmacy.into(d, now.first)
+            if (now.second != was.second && Doctor.of(d) == was.second) d = Doctor.into(d, now.second)
             seen = now
         }
         onPauseOrDispose { }
@@ -118,6 +120,8 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
     }
     BackHandler { back() }
 
+    // One picker for both: which of them it was opened for is kept across the trip out.
+    var picking by rememberSaveable { mutableStateOf("") }
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val uri = result.data?.data ?: return@rememberLauncherForActivityResult
         if (result.resultCode != Activity.RESULT_OK) return@rememberLauncherForActivityResult
@@ -134,11 +138,8 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
             )?.use { c ->
                 if (c.moveToFirst()) {
                     val lookup = ContactsContract.Contacts.getLookupUri(c.getLong(2), c.getString(3))
-                    d = d.copy(
-                        pharmacyName = c.getString(0).orEmpty(),
-                        pharmacyNumber = c.getString(1).orEmpty(),
-                        pharmacyContact = lookup?.toString().orEmpty(),
-                    )
+                    val who = Who(c.getString(0).orEmpty(), c.getString(1).orEmpty(), lookup?.toString().orEmpty())
+                    d = if (picking == DOCTOR) Doctor.into(d, who) else Pharmacy.into(d, who)
                 }
             }
         }.onFailure {
@@ -149,6 +150,14 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
     fun open(intent: Intent, failure: Int) {
         runCatching { context.startActivity(intent) }
             .onFailure { Toast.makeText(context, context.getString(failure), Toast.LENGTH_LONG).show() }
+    }
+
+    fun choose() {
+        runCatching {
+            pick.launch(Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI))
+        }.onFailure {
+            Toast.makeText(context, context.getString(R.string.no_contacts), Toast.LENGTH_LONG).show()
+        }
     }
 
     Scaffold(
@@ -288,54 +297,24 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                 }
             }
 
-            item(key = "pharmacy head") { Heading(stringResource(R.string.edit_pharmacy)) }
-            item(key = "pharmacy name") {
-                Field(stringResource(R.string.edit_pharmacy_name), d.pharmacyName, { d = d.copy(pharmacyName = it, pharmacyContact = "") })
-            }
-            item(key = "pharmacy number") {
-                Field(stringResource(R.string.edit_pharmacy_number), d.pharmacyNumber, { d = d.copy(pharmacyNumber = it, pharmacyContact = "") }, phone = true)
-            }
-            item(key = "pharmacy buttons") {
-                Column(Modifier.padding(vertical = 4.dp)) {
-                    OutlinedButtonMMD(
-                        onClick = {
-                            runCatching {
-                                pick.launch(Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI))
-                            }.onFailure {
-                                Toast.makeText(context, context.getString(R.string.no_contacts), Toast.LENGTH_LONG).show()
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                    ) { TextMMD(text = stringResource(R.string.pharmacy_choose), style = MaterialTheme.typography.bodySmall) }
-                    if (d.pharmacyNumber.isNotBlank()) {
-                        Spacer(Modifier.height(8.dp))
-                        Row(Modifier.fillMaxWidth()) {
-                            OutlinedButtonMMD(
-                                onClick = { open(Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Uri.encode(d.pharmacyNumber))), R.string.no_dialer) },
-                                modifier = Modifier.weight(1f).height(48.dp),
-                            ) { TextMMD(text = stringResource(R.string.pharmacy_call), style = MaterialTheme.typography.bodySmall) }
-                            Spacer(Modifier.width(12.dp))
-                            OutlinedButtonMMD(
-                                onClick = {
-                                    open(
-                                        Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + Uri.encode(d.pharmacyNumber)))
-                                            .putExtra("sms_body", context.getString(R.string.pharmacy_text_body, d.toMedicine(original).label)),
-                                        R.string.no_messaging,
-                                    )
-                                },
-                                modifier = Modifier.weight(1f).height(48.dp),
-                            ) { TextMMD(text = stringResource(R.string.pharmacy_text), style = MaterialTheme.typography.bodySmall) }
-                        }
-                    }
-                    if (d.pharmacyContact.isNotBlank()) {
-                        Spacer(Modifier.height(8.dp))
-                        OutlinedButtonMMD(
-                            onClick = { open(Intent(Intent.ACTION_VIEW, Uri.parse(d.pharmacyContact)), R.string.no_contacts) },
-                            modifier = Modifier.fillMaxWidth().height(48.dp),
-                        ) { TextMMD(text = stringResource(R.string.pharmacy_open_contact), style = MaterialTheme.typography.bodySmall) }
-                    }
-                }
-            }
+            whoSection(
+                key = PHARMACY,
+                heading = R.string.edit_pharmacy,
+                who = Pharmacy.of(d),
+                onChange = { d = Pharmacy.into(d, it) },
+                onChoose = { picking = PHARMACY; choose() },
+                textBody = { context.getString(R.string.pharmacy_text_body, d.toMedicine(original).label) },
+                open = ::open,
+            )
+            whoSection(
+                key = DOCTOR,
+                heading = R.string.edit_doctor,
+                who = Doctor.of(d),
+                onChange = { d = Doctor.into(d, it) },
+                onChoose = { picking = DOCTOR; choose() },
+                textBody = { context.getString(R.string.doctor_text_body, d.toMedicine(original).label) },
+                open = ::open,
+            )
 
             item(key = "notes head") { Heading(stringResource(R.string.edit_notes)) }
             item(key = "notes") {
@@ -383,6 +362,81 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
     }
     if (pickFrom) {
         DateDialog(d.from, onPick = { d = d.copy(from = it) }, onDismiss = { pickFrom = false })
+    }
+}
+
+private const val PHARMACY = "pharmacy"
+private const val DOCTOR = "doctor"
+
+/** A pharmacy or a doctor as the page holds it: a name, a number, and maybe a Contacts entry. */
+private data class Who(val name: String, val number: String, val contact: String)
+
+private object Pharmacy {
+    fun of(m: Medicine) = Who(m.pharmacyName, m.pharmacyNumber, m.pharmacyContact)
+    fun of(d: Draft) = Who(d.pharmacyName, d.pharmacyNumber, d.pharmacyContact)
+    fun into(d: Draft, w: Who) = d.copy(pharmacyName = w.name, pharmacyNumber = w.number, pharmacyContact = w.contact)
+}
+
+private object Doctor {
+    fun of(m: Medicine) = Who(m.doctorName, m.doctorNumber, m.doctorContact)
+    fun of(d: Draft) = Who(d.doctorName, d.doctorNumber, d.doctorContact)
+    fun into(d: Draft, w: Who) = d.copy(doctorName = w.name, doctorNumber = w.number, doctorContact = w.contact)
+}
+
+/**
+ * The pharmacy's or the doctor's part of the page: name and number, typed or chosen from
+ * Contacts; Call and Text once there is a number; Open in Contacts when it came from there.
+ * Typing over a chosen contact lets go of the entry it came from.
+ */
+private fun LazyListScope.whoSection(
+    key: String,
+    heading: Int,
+    who: Who,
+    onChange: (Who) -> Unit,
+    onChoose: () -> Unit,
+    textBody: () -> String,
+    open: (Intent, Int) -> Unit,
+) {
+    item(key = "$key head") { Heading(stringResource(heading)) }
+    item(key = "$key name") {
+        Field(stringResource(R.string.edit_pharmacy_name), who.name, { onChange(who.copy(name = it, contact = "")) })
+    }
+    item(key = "$key number") {
+        Field(stringResource(R.string.edit_pharmacy_number), who.number, { onChange(who.copy(number = it, contact = "")) }, phone = true)
+    }
+    item(key = "$key buttons") {
+        Column(Modifier.padding(vertical = 4.dp)) {
+            OutlinedButtonMMD(
+                onClick = onChoose,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+            ) { TextMMD(text = stringResource(R.string.pharmacy_choose), style = MaterialTheme.typography.bodySmall) }
+            if (who.number.isNotBlank()) {
+                Spacer(Modifier.height(8.dp))
+                Row(Modifier.fillMaxWidth()) {
+                    OutlinedButtonMMD(
+                        onClick = { open(Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Uri.encode(who.number))), R.string.no_dialer) },
+                        modifier = Modifier.weight(1f).height(48.dp),
+                    ) { TextMMD(text = stringResource(R.string.pharmacy_call), style = MaterialTheme.typography.bodySmall) }
+                    Spacer(Modifier.width(12.dp))
+                    OutlinedButtonMMD(
+                        onClick = {
+                            open(
+                                Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + Uri.encode(who.number))).putExtra("sms_body", textBody()),
+                                R.string.no_messaging,
+                            )
+                        },
+                        modifier = Modifier.weight(1f).height(48.dp),
+                    ) { TextMMD(text = stringResource(R.string.pharmacy_text), style = MaterialTheme.typography.bodySmall) }
+                }
+            }
+            if (who.contact.isNotBlank()) {
+                Spacer(Modifier.height(8.dp))
+                OutlinedButtonMMD(
+                    onClick = { open(Intent(Intent.ACTION_VIEW, Uri.parse(who.contact)), R.string.no_contacts) },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                ) { TextMMD(text = stringResource(R.string.pharmacy_open_contact), style = MaterialTheme.typography.bodySmall) }
+            }
+        }
     }
 }
 

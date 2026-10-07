@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
  * Every write bumps [version], which is how the screens know to read again.
  */
 class Store private constructor(context: Context) :
-    SQLiteOpenHelper(context, "fukuyaku.db", null, 1) {
+    SQLiteOpenHelper(context, "fukuyaku.db", null, 2) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(
@@ -30,6 +30,9 @@ class Store private constructor(context: Context) :
                 pharmacy_name TEXT NOT NULL DEFAULT '',
                 pharmacy_number TEXT NOT NULL DEFAULT '',
                 pharmacy_contact TEXT NOT NULL DEFAULT '',
+                doctor_name TEXT NOT NULL DEFAULT '',
+                doctor_number TEXT NOT NULL DEFAULT '',
+                doctor_contact TEXT NOT NULL DEFAULT '',
                 notes TEXT NOT NULL DEFAULT '',
                 paused INTEGER NOT NULL DEFAULT 0,
                 caught_up INTEGER NOT NULL,
@@ -57,7 +60,14 @@ class Store private constructor(context: Context) :
         db.execSQL("CREATE INDEX dose_open ON dose (status, due)")
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        // 2 (0.1.2): each medicine's doctor, empty for the medicines already there.
+        if (oldVersion < 2) {
+            for (col in listOf("doctor_name", "doctor_number", "doctor_contact")) {
+                db.execSQL("ALTER TABLE medicine ADD COLUMN $col TEXT NOT NULL DEFAULT ''")
+            }
+        }
+    }
 
     // ---------------------------------------------------------------- medicines
 
@@ -83,6 +93,9 @@ class Store private constructor(context: Context) :
             put("pharmacy_name", m.pharmacyName)
             put("pharmacy_number", m.pharmacyNumber)
             put("pharmacy_contact", m.pharmacyContact)
+            put("doctor_name", m.doctorName)
+            put("doctor_number", m.doctorNumber)
+            put("doctor_contact", m.doctorContact)
             put("notes", m.notes)
             put("paused", if (m.paused) 1 else 0)
             put("caught_up", m.caughtUp)
@@ -116,6 +129,9 @@ class Store private constructor(context: Context) :
             pharmacyName = c.str("pharmacy_name"),
             pharmacyNumber = c.str("pharmacy_number"),
             pharmacyContact = c.str("pharmacy_contact"),
+            doctorName = c.str("doctor_name"),
+            doctorNumber = c.str("doctor_number"),
+            doctorContact = c.str("doctor_contact"),
             notes = c.str("notes"),
             paused = c.int("paused") != 0,
             caughtUp = c.long("caught_up"),

@@ -35,6 +35,9 @@ data class Draft(
     val pharmacyName: String = "",
     val pharmacyNumber: String = "",
     val pharmacyContact: String = "",
+    val doctorName: String = "",
+    val doctorNumber: String = "",
+    val doctorContact: String = "",
     val notes: String = "",
     val paused: Boolean = false,
 ) {
@@ -76,6 +79,9 @@ data class Draft(
             pharmacyName = pharmacyName.trim(),
             pharmacyNumber = pharmacyNumber.trim(),
             pharmacyContact = pharmacyContact,
+            doctorName = doctorName.trim(),
+            doctorNumber = doctorNumber.trim(),
+            doctorContact = doctorContact,
             notes = notes.trim(),
             paused = paused,
         )
@@ -94,6 +100,9 @@ data class Draft(
                 pharmacyName = m.pharmacyName,
                 pharmacyNumber = m.pharmacyNumber,
                 pharmacyContact = m.pharmacyContact,
+                doctorName = m.doctorName,
+                doctorNumber = m.doctorNumber,
+                doctorContact = m.doctorContact,
                 notes = m.notes,
                 paused = m.paused,
             )
@@ -126,6 +135,7 @@ data class Draft(
                     d.hours, d.hoursFrom.toString(), d.hoursFromDate.toString(),
                     d.counting.toString(), d.left, d.perDose, d.warnAt,
                     d.pharmacyName, d.pharmacyNumber, d.pharmacyContact, d.notes, d.paused.toString(),
+                    d.doctorName, d.doctorNumber, d.doctorContact,
                 ).joinToString(SEP)
             },
             restore = { s ->
@@ -141,6 +151,7 @@ data class Draft(
                         counting = f[11].toBoolean(), left = f[12], perDose = f[13], warnAt = f[14],
                         pharmacyName = f[15], pharmacyNumber = f[16], pharmacyContact = f[17], notes = f[18],
                         paused = f[19].toBoolean(),
+                        doctorName = f.getOrElse(20) { "" }, doctorNumber = f.getOrElse(21) { "" }, doctorContact = f.getOrElse(22) { "" },
                     )
                 }.getOrNull()
             },

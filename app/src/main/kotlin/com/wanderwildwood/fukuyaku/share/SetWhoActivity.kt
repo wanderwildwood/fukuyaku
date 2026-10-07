@@ -29,21 +29,35 @@ import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.alarm.Reminders
+import com.wanderwildwood.fukuyaku.data.Medicine
 import com.wanderwildwood.fukuyaku.data.Store
 import com.wanderwildwood.fukuyaku.ui.CheckRow
 import com.wanderwildwood.fukuyaku.ui.monochrome
 
 /**
- * A pharmacy handed over by another app: Contacts' "Set as pharmacy in Medicine". The
- * pharmacy belongs to each medicine, so this asks which ones, every medicine ticked to start,
- * and nothing changes until Set is pressed. Then each ticked medicine gets it exactly as if it
- * had been chosen from Contacts on its own page.
+ * A pharmacy or a doctor handed over by another app: Contacts' "Set as pharmacy in Medicine"
+ * and "Set as doctor in Medicine". Both belong to each medicine, so this asks which ones,
+ * every medicine ticked to start, and nothing changes until Set is pressed. Then each ticked
+ * medicine gets it exactly as if it had been chosen from Contacts on its own page.
  *
- * Action `com.wanderwildwood.fukuyaku.action.SET_PHARMACY`, with [EXTRA_NAME] and
- * [EXTRA_NUMBER] (a number is needed), and [EXTRA_CONTACT], the contact's lookup URI, when
- * there is one. Set returns RESULT_OK; anything else RESULT_CANCELED.
+ * Actions `com.wanderwildwood.fukuyaku.action.SET_PHARMACY` ([SetPharmacyActivity]) and
+ * `….SET_DOCTOR` ([SetDoctorActivity]), with [EXTRA_NAME] and [EXTRA_NUMBER] (a number is
+ * needed), and [EXTRA_CONTACT], the contact's lookup URI, when there is one. Set returns
+ * RESULT_OK; anything else RESULT_CANCELED.
  */
-class SetPharmacyActivity : ComponentActivity() {
+abstract class SetWhoActivity(
+    private val title: Int,
+    private val ask: Int,
+    private val none: Int,
+    private val yes: Int,
+    private val done: Int,
+) : ComponentActivity() {
+
+    /** [m] with the one that arrived set on it. */
+    abstract fun apply(m: Medicine, given: Given): Medicine
+
+    /** Who [m] has now, shown under it so a medicine with someone else can be unticked. */
+    abstract fun current(m: Medicine): String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +78,7 @@ class SetPharmacyActivity : ComponentActivity() {
                 var ticked by rememberSaveable { mutableStateOf(medicines.map { it.id }) }
                 Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
                     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp)) {
-                        TextMMD(text = stringResource(R.string.edit_pharmacy), style = MaterialTheme.typography.titleLarge)
+                        TextMMD(text = stringResource(title), style = MaterialTheme.typography.titleLarge)
                         Spacer(Modifier.height(12.dp))
                         TextMMD(
                             text = listOf(given.name, given.number).filter { it.isNotEmpty() }.joinToString("  "),
@@ -73,13 +87,16 @@ class SetPharmacyActivity : ComponentActivity() {
                         )
                         Spacer(Modifier.height(8.dp))
                         TextMMD(
-                            text = stringResource(if (medicines.isEmpty()) R.string.pharmacy_set_none else R.string.pharmacy_set_ask),
+                            text = stringResource(if (medicines.isEmpty()) none else ask),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         LazyColumnMMD(modifier = Modifier.weight(1f).fillMaxWidth()) {
                             medicines.forEach { m ->
                                 item(key = m.id) {
-                                    CheckRow(m.label, m.id in ticked) { on -> ticked = if (on) ticked + m.id else ticked - m.id }
+                                    val now = current(m).takeIf { it.isNotBlank() && it != given.name.ifBlank { given.number } }
+                                    CheckRow(if (now == null) m.label else m.label + " (" + now + ")", m.id in ticked) { on ->
+                                        ticked = if (on) ticked + m.id else ticked - m.id
+                                    }
                                 }
                             }
                         }
@@ -88,14 +105,11 @@ class SetPharmacyActivity : ComponentActivity() {
                                 onClick = {
                                     val chosen = medicines.filter { it.id in ticked }
                                     chosen.forEach { m ->
-                                        Reminders.save(
-                                            this@SetPharmacyActivity,
-                                            m.copy(pharmacyName = given.name, pharmacyNumber = given.number, pharmacyContact = given.contact),
-                                        )
+                                        Reminders.save(this@SetWhoActivity, apply(m, given))
                                     }
                                     Toast.makeText(
-                                        this@SetPharmacyActivity,
-                                        resources.getQuantityString(R.plurals.pharmacy_set_done, chosen.size, chosen.size),
+                                        this@SetWhoActivity,
+                                        resources.getQuantityString(done, chosen.size, chosen.size),
                                         Toast.LENGTH_SHORT,
                                     ).show()
                                     setResult(Activity.RESULT_OK)
@@ -103,7 +117,7 @@ class SetPharmacyActivity : ComponentActivity() {
                                 },
                                 enabled = ticked.isNotEmpty(),
                                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                            ) { TextMMD(text = stringResource(R.string.pharmacy_set_yes), style = MaterialTheme.typography.bodyMedium) }
+                            ) { TextMMD(text = stringResource(yes), style = MaterialTheme.typography.bodyMedium) }
                             Spacer(Modifier.height(8.dp))
                         }
                         OutlinedButtonMMD(
@@ -121,7 +135,7 @@ class SetPharmacyActivity : ComponentActivity() {
         }
     }
 
-    /** A pharmacy as it arrived, cleaned. */
+    /** A pharmacy or doctor as it arrived, cleaned. */
     data class Given(val name: String, val number: String, val contact: String)
 
     companion object {
@@ -142,4 +156,24 @@ class SetPharmacyActivity : ComponentActivity() {
             return Given(who, n, entry)
         }
     }
+}
+
+/** Contacts' "Set as pharmacy in Medicine". */
+class SetPharmacyActivity : SetWhoActivity(
+    R.string.edit_pharmacy, R.string.pharmacy_set_ask, R.string.pharmacy_set_none, R.string.pharmacy_set_yes, R.plurals.pharmacy_set_done,
+) {
+    override fun apply(m: Medicine, given: Given) =
+        m.copy(pharmacyName = given.name, pharmacyNumber = given.number, pharmacyContact = given.contact)
+
+    override fun current(m: Medicine) = m.pharmacyName.ifBlank { m.pharmacyNumber }
+}
+
+/** Contacts' "Set as doctor in Medicine". */
+class SetDoctorActivity : SetWhoActivity(
+    R.string.edit_doctor, R.string.doctor_set_ask, R.string.doctor_set_none, R.string.doctor_set_yes, R.plurals.doctor_set_done,
+) {
+    override fun apply(m: Medicine, given: Given) =
+        m.copy(doctorName = given.name, doctorNumber = given.number, doctorContact = given.contact)
+
+    override fun current(m: Medicine) = m.doctor
 }

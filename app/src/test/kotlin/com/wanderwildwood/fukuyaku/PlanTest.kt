@@ -179,7 +179,28 @@ class PlanTest {
         )
         val lines = Export.csv(doses, ny).trimEnd().split("\r\n")
         assertEquals(3, lines.size)
-        assertEquals("Metformin,500 mg,2026-10-05 20:00,not marked,,,no", lines[1])
-        assertEquals("Metformin,500 mg,2026-10-06 08:00,taken,2026-10-06 08:04,2026-10-06 08:00,no", lines[2])
+        assertEquals("Metformin,500 mg,2026-10-05 20:00,not marked,,,no,", lines[1])
+        assertEquals("Metformin,500 mg,2026-10-06 08:00,taken,2026-10-06 08:04,2026-10-06 08:00,no,", lines[2])
+    }
+
+    @Test fun csvNamesTheDoctor() {
+        val doses = listOf(dose(at(2026, 10, 5, 20)))
+        val lines = Export.csv(doses, ny, mapOf(doses[0].medicineId to "Dr Ada Whitlock, MD")).trimEnd().split("\r\n")
+        assertEquals("medicine,amount,due,status,marked,reminder_rang,as_needed,doctor", lines[0])
+        assertEquals("Metformin,500 mg,2026-10-05 20:00,not marked,,,no,\"Dr Ada Whitlock, MD\"", lines[1])
+    }
+
+    @Test fun doctorsReadAsNameOrNumber() {
+        val base = Medicine(id = 1, name = "Metformin", amount = "500 mg", schedule = Schedule.AsNeeded)
+        val meds = listOf(
+            base,
+            base.copy(id = 2, name = "Lisinopril", amount = "10 mg", doctorName = "Dr Ada Whitlock", doctorNumber = "555 0100"),
+            base.copy(id = 3, name = "Atorvastatin", amount = "", doctorNumber = "555 0199"),
+        )
+        assertEquals(mapOf(2L to "Dr Ada Whitlock", 3L to "555 0199"), Export.doctorsById(meds))
+        assertEquals(
+            listOf("Lisinopril, 10 mg" to "Dr Ada Whitlock, 555 0100", "Atorvastatin" to "555 0199"),
+            Export.doctorLines(meds),
+        )
     }
 }

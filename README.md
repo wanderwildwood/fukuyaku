@@ -32,10 +32,12 @@ ships with.
   did not ring, and the first screen says when the app was stopped.
 - **Counts what is left**, if you want it to, and says once when it gets low. From there the
   pharmacy is a press away: **Call** or **Text** it, chosen from Contacts or typed in, and the
-  refill can go into the calendar with **Put the refill in the calendar**.
+  refill can go into the calendar with **Put the refill in the calendar**. Each medicine can
+  name its doctor the same way, to call or text about it.
 - **The log** shows each medicine's last 7 and 30 days and a strip of the last fortnight, then
   every dose by day. A dose marked late can be marked as taken at its time or just now. It can
-  be shared as text, into a note or a message, or saved as a CSV file.
+  be shared as text, into a note or a message, or saved as a CSV file; both name each
+  medicine's doctor, when it has one.
 - **Try a reminder**, in Settings, rings one in a minute through the same alarm a dose uses, to
   see how it looks and sounds on your phone.
 
@@ -68,7 +70,7 @@ DuraSpeed stops the app again later, the step comes back.
 - **Calendar** ([koyomi](https://github.com/wanderwildwood/koyomi)), or any calendar app,
   opens with the refill filled in.
 - **Contacts** ([enishi](https://github.com/wanderwildwood/enishi)), or the phone's own, is
-  where the pharmacy is chosen from, and **Open in Contacts** goes back to it.
+  where the pharmacy and the doctor are chosen from, and **Open in Contacts** goes back to them.
 - **Notes**, **Email** and **Messaging** take the log through **Share as text**; **Files**
   ([tana](https://github.com/wanderwildwood/tana)) is one place to save the CSV.
 
@@ -76,13 +78,14 @@ DuraSpeed stops the app again later, the step comes back.
 
 Another app can ask for the list of medicines being taken, and gets it only after you see the
 list on Medicine's own screen and press **Share**. Field Kit uses it to fill the medicines on
-its emergency card. Only names, amounts and when they are taken go across; not the log, what is
-left, or the pharmacy.
+its emergency card. Only names, amounts, when they are taken and the doctor's name go across;
+not the log, what is left, the pharmacy, or the doctor's number.
 
 - Start for a result: action `com.wanderwildwood.fukuyaku.action.SHARE_MEDICINES`, with
   `setPackage("com.wanderwildwood.fukuyaku")`.
 - On Share: `RESULT_OK`, with `Intent.EXTRA_TEXT` holding plain text, one medicine per line,
-  e.g. `Lisinopril 10 mg, every day at 8:00 AM`. Paused medicines are left out.
+  e.g. `Lisinopril 10 mg, every day at 8:00 AM (Dr Ada Whitlock)`; the brackets only when the
+  medicine has a doctor. Paused medicines are left out.
 - On Don't share, Back, or when there are no medicines: `RESULT_CANCELED`.
 - An app targeting Android 11 or later also needs
   `<queries><package android:name="com.wanderwildwood.fukuyaku" /></queries>`.
@@ -98,6 +101,9 @@ has it, as if chosen from Contacts on its own page.
   (needed) and, optionally, `com.wanderwildwood.fukuyaku.extra.CONTACT`, the contact's
   lookup URI for "Open in Contacts".
 - On Set pharmacy: `RESULT_OK`. Otherwise `RESULT_CANCELED`.
+
+A doctor comes the same way ("Set as doctor in Medicine"): action
+`com.wanderwildwood.fukuyaku.action.SET_DOCTOR`, the same three extras, and **Set doctor**.
 
 ## Building
 

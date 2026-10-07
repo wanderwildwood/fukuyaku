@@ -36,8 +36,9 @@ import com.wanderwildwood.fukuyaku.ui.monochrome
  *
  * Started for a result with action `com.wanderwildwood.fukuyaku.action.SHARE_MEDICINES` and
  * this package set. Share returns RESULT_OK with `Intent.EXTRA_TEXT`: one medicine per line,
- * "Lisinopril 10 mg, every day at 8:00 AM". Anything else returns RESULT_CANCELED. Paused
- * medicines are left out; nothing from the log, the supply or the pharmacy is included.
+ * "Lisinopril 10 mg, every day at 8:00 AM", with the doctor's name after it in brackets when
+ * there is one. Anything else returns RESULT_CANCELED. Paused medicines are left out; nothing
+ * from the log, the supply or the pharmacy is included, nor the doctor's number.
  */
 class ShareMedicinesActivity : ComponentActivity() {
 
@@ -96,7 +97,10 @@ class ShareMedicinesActivity : ComponentActivity() {
     }
 
     companion object {
-        /** "Lisinopril 10 mg, every day at 8:00 AM", one per medicine that is not paused. */
+        /**
+         * "Lisinopril 10 mg, every day at 8:00 AM (Dr Ada Whitlock)", one per medicine that is
+         * not paused; the doctor only by name, and only when there is one.
+         */
         fun lines(context: Context): List<String> =
             Store.get(context).medicines().filter { !it.paused }.map { m ->
                 val name = listOf(m.name, m.amount).filter { it.isNotBlank() }.joinToString(" ")
@@ -104,7 +108,8 @@ class ShareMedicinesActivity : ComponentActivity() {
                 // "every day at …" reads on from the name; a list of days keeps its capitals.
                 val schedule = if (m.schedule is Schedule.AtTimes && (m.schedule as Schedule.AtTimes).days is Days.OnDays) words
                 else words.replaceFirstChar { it.lowercase() }
-                "$name, $schedule"
+                val doctor = m.doctorName.trim().takeIf { it.isNotEmpty() }?.let { " ($it)" }.orEmpty()
+                "$name, $schedule$doctor"
             }
     }
 }
