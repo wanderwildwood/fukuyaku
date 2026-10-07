@@ -99,6 +99,21 @@
             </intent-filter>
         </activity>
 
+        <!-- A pharmacy sent from Contacts ("Set as pharmacy in Medicine"), set only after the
+             person ticks which medicines it is for and presses Set. See
+             share/SetPharmacyActivity.kt and "For other apps" in the README. -->
+        <activity
+            android:name=".share.SetPharmacyActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="com.wanderwildwood.fukuyaku.action.SET_PHARMACY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

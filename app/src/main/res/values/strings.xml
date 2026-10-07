@@ -158,6 +158,14 @@
     <!-- Put into a new text message to the pharmacy; %1$s is the medicine -->
     <string name="pharmacy_text_body">Refill: %1$s</string>
     <string name="pharmacy_unreadable">That contact could not be read. Type the name and number instead.</string>
+    <!-- A pharmacy sent from Contacts: which medicines it is for -->
+    <string name="pharmacy_set_ask">Make this the pharmacy for the medicines ticked here?</string>
+    <string name="pharmacy_set_none">No medicines are set up yet. Add one first; its page can choose this pharmacy from Contacts.</string>
+    <string name="pharmacy_set_yes">Set pharmacy</string>
+    <plurals name="pharmacy_set_done">
+        <item quantity="one">Pharmacy set for %1$d medicine</item>
+        <item quantity="other">Pharmacy set for %1$d medicines</item>
+    </plurals>
     <string name="edit_notes">Notes</string>
     <string name="edit_notes_label">Shown with each reminder</string>
     <string name="edit_notes_hint">With food, for example</string>

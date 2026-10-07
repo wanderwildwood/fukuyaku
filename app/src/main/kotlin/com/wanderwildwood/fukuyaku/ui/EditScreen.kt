@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
@@ -74,6 +75,21 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
     var pickTime by remember { mutableStateOf<Int?>(null) }
     var pickHoursFrom by remember { mutableStateOf(false) }
     var pickFrom by remember { mutableStateOf(false) }
+
+    // A pharmacy set from Contacts while this page was open underneath comes into the page,
+    // unless the pharmacy here was changed by hand meanwhile, so Back does not undo it.
+    var seen by remember(id) { mutableStateOf(original?.let { Triple(it.pharmacyName, it.pharmacyNumber, it.pharmacyContact) }) }
+    LifecycleResumeEffect(id) {
+        val fresh = original?.let { store.medicine(it.id) }
+        val now = fresh?.let { Triple(it.pharmacyName, it.pharmacyNumber, it.pharmacyContact) }
+        if (now != null && now != seen) {
+            if (Triple(d.pharmacyName, d.pharmacyNumber, d.pharmacyContact) == seen) {
+                d = d.copy(pharmacyName = now.first, pharmacyNumber = now.second, pharmacyContact = now.third)
+            }
+            seen = now
+        }
+        onPauseOrDispose { }
+    }
 
     LaunchedEffect(leaving) {
         if (leaving) {

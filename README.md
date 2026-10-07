@@ -87,6 +87,18 @@ left, or the pharmacy.
 - An app targeting Android 11 or later also needs
   `<queries><package android:name="com.wanderwildwood.fukuyaku" /></queries>`.
 
+Another app can also offer a pharmacy. Contacts does it from a person's More page ("Set as
+pharmacy in Medicine"). Medicine shows the name and number with every medicine ticked; you
+untick any that use a different pharmacy and press **Set pharmacy**. Each ticked medicine then
+has it, as if chosen from Contacts on its own page.
+
+- Start: action `com.wanderwildwood.fukuyaku.action.SET_PHARMACY`, with
+  `setPackage("com.wanderwildwood.fukuyaku")` and string extras
+  `com.wanderwildwood.fukuyaku.extra.NAME`, `com.wanderwildwood.fukuyaku.extra.NUMBER`
+  (needed) and, optionally, `com.wanderwildwood.fukuyaku.extra.CONTACT`, the contact's
+  lookup URI for "Open in Contacts".
+- On Set pharmacy: `RESULT_OK`. Otherwise `RESULT_CANCELED`.
+
 ## Building
 
 ```
