@@ -169,7 +169,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
             )
         },
     ) { padding ->
-        LazyColumnMMD(modifier = Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp)) {
+        LazyColumnMMD(modifier = Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
             problem?.let { p ->
                 item(key = "problem") {
                     TextMMD(

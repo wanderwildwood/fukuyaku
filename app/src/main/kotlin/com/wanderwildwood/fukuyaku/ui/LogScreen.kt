@@ -92,7 +92,7 @@ fun LogScreen() {
     val summaries = remember(list) { summaries(list, today, zone, now) }
     val byDay = remember(list) { list.groupBy { Times.date(it.due) }.toSortedMap(compareByDescending { it }) }
 
-    LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+    LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
         if (list.isEmpty()) {
             item(key = "empty") {
                 TextMMD(

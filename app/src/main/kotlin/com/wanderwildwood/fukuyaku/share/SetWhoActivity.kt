@@ -90,7 +90,7 @@ abstract class SetWhoActivity(
                             text = stringResource(if (medicines.isEmpty()) none else ask),
                             style = MaterialTheme.typography.bodyMedium,
                         )
-                        LazyColumnMMD(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                        LazyColumnMMD(modifier = Modifier.weight(1f).fillMaxWidth(), isScrollbarVisible = false) {
                             medicines.forEach { m ->
                                 item(key = m.id) {
                                     val now = current(m).takeIf { it.isNotBlank() && it != given.name.ifBlank { given.number } }

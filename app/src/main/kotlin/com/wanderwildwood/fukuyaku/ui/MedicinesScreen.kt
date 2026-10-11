@@ -32,7 +32,7 @@ fun MedicinesScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
     val version by Store.version.collectAsState()
     val medicines = remember(version) { Store.get(context).medicines() }
 
-    LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+    LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
         item(key = "add") {
             OutlinedButtonMMD(onClick = onAdd, modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp).height(48.dp)) {
                 TextMMD(text = stringResource(R.string.add_medicine), style = MaterialTheme.typography.bodyMedium)

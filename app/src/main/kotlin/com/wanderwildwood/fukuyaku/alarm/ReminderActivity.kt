@@ -73,7 +73,7 @@ private fun Ringing(onDone: () -> Unit) {
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp)) {
         TextMMD(text = stringResource(R.string.ringing_title), style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(8.dp))
-        LazyColumnMMD(modifier = Modifier.weight(1f).fillMaxWidth()) {
+        LazyColumnMMD(modifier = Modifier.weight(1f).fillMaxWidth(), isScrollbarVisible = false) {
             if (test) {
                 item(key = "test") {
                     Column(Modifier.padding(vertical = 12.dp)) {

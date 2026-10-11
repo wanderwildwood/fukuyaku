@@ -95,7 +95,7 @@ fun TodayScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
     var chosen by remember { mutableStateOf<Line?>(null) }
     var taking by remember { mutableStateOf<Medicine?>(null) }
 
-    LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+    LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
         item(key = "top") { Spacer(Modifier.height(8.dp)) }
         problems.forEachIndexed { i, p -> item(key = "problem:$i") { ProblemCard(p) } }
 
