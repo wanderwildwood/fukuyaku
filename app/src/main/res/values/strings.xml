@@ -60,6 +60,11 @@
     <!-- %1$s is the time it was due -->
     <string name="taken_then">Taken at %1$s</string>
     <string name="taken_now">Taken just now</string>
+    <!-- Opens a day and a time to say when it was taken, for a dose marked later -->
+    <string name="taken_other">Taken at another time</string>
+    <string name="taken_when">When was it taken?</string>
+    <!-- The day and time chosen have not come yet -->
+    <string name="taken_ahead">That time has not come yet.</string>
     <string name="unmark">Not marked after all</string>
     <string name="mark_skipped">Skipped after all</string>
     <string name="remove_from_log">Take out of the log</string>

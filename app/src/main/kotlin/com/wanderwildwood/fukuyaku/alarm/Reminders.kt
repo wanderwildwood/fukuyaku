@@ -142,13 +142,7 @@ object Reminders {
     fun mark(context: Context, doseId: Long, status: Status, at: Long = System.currentTimeMillis()) = synchronized(lock) {
         val store = Store.get(context)
         val dose = store.dose(doseId) ?: return@synchronized
-        store.updateDose(
-            dose.copy(
-                status = status,
-                marked = if (status == Status.OPEN) null else at,
-                remindAt = null,
-            ),
-        )
+        store.updateDose(Plan.marked(dose, status, at))
         Notifier.cancel(context, doseId)
         store.medicine(dose.medicineId)?.let {
             recount(context, store, it, dose.status == Status.TAKEN, status == Status.TAKEN)
@@ -193,12 +187,10 @@ object Reminders {
         GlanceProvider.changed(context)
     }
 
-    /** A dose of a medicine taken as needed, written down as taken now. */
+    /** A dose of a medicine taken as needed, written down as taken now, or at [at] when it was earlier. */
     fun takeAsNeeded(context: Context, med: Medicine, at: Long = System.currentTimeMillis()) = synchronized(lock) {
         val store = Store.get(context)
-        val id = store.addDose(
-            Dose(medicineId = med.id, name = med.name, amount = med.amount, due = at, status = Status.TAKEN, marked = at, asNeeded = true),
-        )
+        val id = store.addDose(Plan.asNeeded(med, at))
         if (id > 0) recount(context, store, med, wasTaken = false, nowTaken = true)
         GlanceProvider.changed(context)
     }

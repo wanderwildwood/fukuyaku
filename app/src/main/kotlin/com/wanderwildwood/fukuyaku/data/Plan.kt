@@ -2,6 +2,7 @@ package com.wanderwildwood.fukuyaku.data
 
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 
 /**
@@ -91,6 +92,37 @@ object Plan {
         val step = med.perDose.coerceAtLeast(1)
         return if (taken) maxOf(0, left - step) else left + step
     }
+
+    /**
+     * [dose] marked [status] at [at]: when it was taken or skipped, or no time at all when it goes
+     * back to not marked. It stops ringing either way. Its due time never moves, so a dose marked
+     * taken earlier than now changes neither the schedule nor when the next one is due.
+     */
+    fun marked(dose: Dose, status: Status, at: Long): Dose =
+        dose.copy(status = status, marked = if (status == Status.OPEN) null else at, remindAt = null)
+
+    /** A dose of [med], taken when needed at [at], as it is written into the log. */
+    fun asNeeded(med: Medicine, at: Long): Dose =
+        Dose(medicineId = med.id, name = med.name, amount = med.amount, due = at, status = Status.TAKEN, marked = at, asNeeded = true)
+
+    /**
+     * The days a dose can be said to have been taken on, newest first: today and yesterday, and
+     * the day it was due when that is older still, so a dose left from two days ago can be marked
+     * for its own day.
+     */
+    fun takenDays(today: LocalDate, due: LocalDate?): List<LocalDate> {
+        val days = mutableListOf(today, today.minusDays(1))
+        if (due != null && due < today.minusDays(1)) days += due
+        return days
+    }
+
+    /**
+     * The moment of [time] on [day] on the phone's clock, or null when it has not come yet at
+     * [now]: a dose cannot be written down as taken in the future. A time the clock skipped,
+     * going forward in spring, is moved on by the length of the gap, as the clock itself was.
+     */
+    fun takenAt(day: LocalDate, time: LocalTime, zone: ZoneId, now: Long): Long? =
+        day.atTime(time).atZone(zone).toInstant().toEpochMilli().takeIf { it <= now }
 
     /** How the scheduled doses due in a stretch of time went. As-needed doses are not counted. */
     data class Tally(val taken: Int, val skipped: Int, val notMarked: Int) {

@@ -2,6 +2,7 @@ package com.wanderwildwood.fukuyaku.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,9 +39,12 @@ import com.mudita.mmd.components.time.rememberDatePickerMMDState
 import com.mudita.mmd.components.time.rememberTimeInputMMDState
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
+import com.wanderwildwood.fukuyaku.data.Plan
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 
 /**
@@ -56,6 +64,46 @@ fun TimeDialog(initial: LocalTime, onPick: (LocalTime) -> Unit, onDismiss: () ->
             onDismiss()
         })
     }
+}
+
+/**
+ * When a dose was taken, chosen in place in the dialog that asked rather than in a second one
+ * over it: the day, from today and yesterday (and the day it was due, when that is older), then
+ * the hour and minute on Mudita's time input, on the 24-hour clock as [TimeDialog] is. It starts
+ * at now; a time still to come is refused, and says so.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ColumnScope.TakenAtPicker(due: Long?, onPick: (Long) -> Unit, onCancel: () -> Unit) {
+    val context = LocalContext.current
+    val zone = ZoneId.systemDefault()
+    val now = remember { LocalDateTime.now(zone) }
+    val days = remember { Plan.takenDays(now.toLocalDate(), due?.let { Times.date(it) }) }
+    var day by remember { mutableStateOf(days.first()) }
+    var ahead by remember { mutableStateOf(false) }
+    val state = rememberTimeInputMMDState(initialHour = now.hour, initialMinute = now.minute, is24Hour = true)
+    TextMMD(text = stringResource(R.string.taken_when), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+    Spacer(Modifier.height(4.dp))
+    for (d in days) {
+        ChoiceRow(Times.relativeDay(context, d), d == day) {
+            day = d
+            ahead = false
+        }
+    }
+    Spacer(Modifier.height(8.dp))
+    TimeInputMMD(state = state, modifier = Modifier.align(Alignment.CenterHorizontally))
+    if (ahead) {
+        TextMMD(
+            text = stringResource(R.string.taken_ahead),
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+    }
+    Spacer(Modifier.height(8.dp))
+    DialogButtons(onCancel = onCancel, onOk = {
+        val at = Plan.takenAt(day, LocalTime.of(state.hour, state.minute), zone, System.currentTimeMillis())
+        if (at == null) ahead = true else onPick(at)
+    })
 }
 
 /**

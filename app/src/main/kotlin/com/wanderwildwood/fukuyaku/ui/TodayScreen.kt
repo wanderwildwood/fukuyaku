@@ -94,6 +94,8 @@ fun TodayScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
 
     var chosen by remember { mutableStateOf<Line?>(null) }
     var taking by remember { mutableStateOf<Medicine?>(null) }
+    // The dose taken when needed is being given an earlier time than now.
+    var takingEarlier by remember(taking) { mutableStateOf(false) }
 
     LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
         item(key = "top") { Spacer(Modifier.height(8.dp)) }
@@ -189,11 +191,19 @@ fun TodayScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
             TextMMD(text = m.label, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
             if (m.notes.isNotBlank()) TextMMD(text = m.notes, style = MaterialTheme.typography.labelSmall)
             Spacer(Modifier.height(12.dp))
-            DialogButton(stringResource(R.string.take_now), filled = true) {
-                Reminders.takeAsNeeded(context, m)
-                taking = null
+            if (takingEarlier) {
+                TakenAtPicker(due = null, onPick = {
+                    Reminders.takeAsNeeded(context, m, it)
+                    taking = null
+                }, onCancel = { takingEarlier = false })
+            } else {
+                DialogButton(stringResource(R.string.take_now), filled = true) {
+                    Reminders.takeAsNeeded(context, m)
+                    taking = null
+                }
+                DialogButton(stringResource(R.string.taken_other)) { takingEarlier = true }
+                DialogButton(stringResource(R.string.cancel)) { taking = null }
             }
-            DialogButton(stringResource(R.string.cancel)) { taking = null }
         }
     }
 }
@@ -228,11 +238,13 @@ fun DoseRow(time: String, label: String, status: String, bold: Boolean, onClick:
 
 /**
  * A dose in the log, pressed: mark it, or change what it says. A dose marked well after its
- * time asks whether it was taken then or only now, because the log should say which.
+ * time asks whether it was taken then or only now, because the log should say which; and any
+ * dose whose time has come can be given the time it really was taken, when that was neither.
  */
 @Composable
 fun DoseDialog(d: Dose, now: Long, onDismiss: () -> Unit, onEdit: (() -> Unit)? = null) {
     val context = LocalContext.current
+    var picking by remember(d.id) { mutableStateOf(false) }
     fun mark(status: Status, at: Long = System.currentTimeMillis()) {
         Reminders.mark(context, d.id, status, at)
         onDismiss()
@@ -245,33 +257,39 @@ fun DoseDialog(d: Dose, now: Long, onDismiss: () -> Unit, onEdit: (() -> Unit)? 
             style = MaterialTheme.typography.labelSmall,
         )
         Spacer(Modifier.height(12.dp))
-        when (d.status) {
-            Status.OPEN -> {
-                if (d.due > now) {
-                    DialogButton(stringResource(R.string.take_early), filled = true) { mark(Status.TAKEN) }
-                } else if (now - d.due > 30 * 60_000L) {
-                    DialogButton(stringResource(R.string.taken_then, Times.time(context, d.due)), filled = true) { mark(Status.TAKEN, d.due) }
-                    DialogButton(stringResource(R.string.taken_now)) { mark(Status.TAKEN) }
-                } else {
-                    DialogButton(stringResource(R.string.action_taken), filled = true) { mark(Status.TAKEN) }
-                }
-                DialogButton(stringResource(R.string.action_skip)) { mark(Status.SKIPPED) }
-            }
-            else -> {
-                if (d.asNeeded) {
-                    DialogButton(stringResource(R.string.remove_from_log)) {
-                        Reminders.remove(context, d.id)
-                        onDismiss()
+        if (picking) {
+            TakenAtPicker(due = d.due, onPick = { mark(Status.TAKEN, it) }, onCancel = { picking = false })
+        } else {
+            when (d.status) {
+                Status.OPEN -> {
+                    if (d.due > now) {
+                        DialogButton(stringResource(R.string.take_early), filled = true) { mark(Status.TAKEN) }
+                    } else if (now - d.due > 30 * 60_000L) {
+                        DialogButton(stringResource(R.string.taken_then, Times.time(context, d.due)), filled = true) { mark(Status.TAKEN, d.due) }
+                        DialogButton(stringResource(R.string.taken_now)) { mark(Status.TAKEN) }
+                        DialogButton(stringResource(R.string.taken_other)) { picking = true }
+                    } else {
+                        DialogButton(stringResource(R.string.action_taken), filled = true) { mark(Status.TAKEN) }
+                        DialogButton(stringResource(R.string.taken_other)) { picking = true }
                     }
-                } else {
-                    DialogButton(stringResource(R.string.unmark)) { mark(Status.OPEN) }
+                    DialogButton(stringResource(R.string.action_skip)) { mark(Status.SKIPPED) }
                 }
-                if (d.status == Status.TAKEN && !d.asNeeded) DialogButton(stringResource(R.string.mark_skipped)) { mark(Status.SKIPPED) }
-                if (d.status == Status.SKIPPED) DialogButton(stringResource(R.string.action_taken)) { mark(Status.TAKEN) }
+                else -> {
+                    if (d.asNeeded) {
+                        DialogButton(stringResource(R.string.remove_from_log)) {
+                            Reminders.remove(context, d.id)
+                            onDismiss()
+                        }
+                    } else {
+                        DialogButton(stringResource(R.string.unmark)) { mark(Status.OPEN) }
+                    }
+                    if (d.status == Status.TAKEN && !d.asNeeded) DialogButton(stringResource(R.string.mark_skipped)) { mark(Status.SKIPPED) }
+                    if (d.status == Status.SKIPPED) DialogButton(stringResource(R.string.action_taken)) { mark(Status.TAKEN) }
+                }
             }
+            if (onEdit != null) DialogButton(stringResource(R.string.open_medicine)) { onEdit() }
+            DialogButton(stringResource(R.string.close)) { onDismiss() }
         }
-        if (onEdit != null) DialogButton(stringResource(R.string.open_medicine)) { onEdit() }
-        DialogButton(stringResource(R.string.close)) { onDismiss() }
     }
 }
 
