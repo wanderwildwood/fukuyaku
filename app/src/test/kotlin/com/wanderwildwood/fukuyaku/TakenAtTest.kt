@@ -117,9 +117,10 @@ class TakenAtTest {
     // ---------------------------------------------------------------- what follows from it
 
     @Test fun theNextDoseDoesNotMoveWithTheTimeItWasTaken() {
-        val now = at(2026, 10, 7, 9, 30)
+        // After the medicine's caughtUp (the 7th, 21:00), so the schedule is what decides.
+        val now = at(2026, 10, 8, 9, 30)
         val before = Plan.nextUnlogged(med, now, ny, emptySet())
-        assertEquals(at(2026, 10, 7, 20), before)
+        assertEquals(at(2026, 10, 8, 20), before)
         assertEquals(before, Plan.nextUnlogged(med, now, ny, setOf(evening.due)))
     }
 
