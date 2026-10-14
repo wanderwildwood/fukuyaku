@@ -106,12 +106,15 @@ object Plan {
         Dose(medicineId = med.id, name = med.name, amount = med.amount, due = at, status = Status.TAKEN, marked = at, asNeeded = true)
 
     /**
-     * The days a dose can be said to have been taken on, newest first: today and yesterday, and
+     * The days a dose can be said to have been taken on, newest first: today, and yesterday, and
      * the day it was due when that is older still, so a dose left from two days ago can be marked
-     * for its own day.
+     * for its own day. Never a day before the dose was due: today's 09:00 taken yesterday would
+     * be the dose before it. Earlier on its own day is still allowed, for a dose taken a little
+     * early. A medicine taken when needed has no due day, and gets today and yesterday.
      */
     fun takenDays(today: LocalDate, due: LocalDate?): List<LocalDate> {
-        val days = mutableListOf(today, today.minusDays(1))
+        val days = mutableListOf(today)
+        if (due == null || due < today) days += today.minusDays(1)
         if (due != null && due < today.minusDays(1)) days += due
         return days
     }

@@ -72,8 +72,12 @@ class TakenAtTest {
     @Test fun theDaysOfferedAreTodayAndYesterday() {
         val today = LocalDate.of(2026, 10, 7)
         assertEquals(listOf(today, today.minusDays(1)), Plan.takenDays(today, null))
-        assertEquals(listOf(today, today.minusDays(1)), Plan.takenDays(today, today))
         assertEquals(listOf(today, today.minusDays(1)), Plan.takenDays(today, today.minusDays(1)))
+    }
+
+    @Test fun aDoseDueTodayCannotBeTakenTheDayBefore() {
+        val today = LocalDate.of(2026, 10, 7)
+        assertEquals(listOf(today), Plan.takenDays(today, today))
     }
 
     @Test fun anOlderDoseAlsoOffersItsOwnDay() {

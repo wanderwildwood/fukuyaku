@@ -68,7 +68,7 @@ fun TimeDialog(initial: LocalTime, onPick: (LocalTime) -> Unit, onDismiss: () ->
 
 /**
  * When a dose was taken, chosen in place in the dialog that asked rather than in a second one
- * over it: the day, from today and yesterday (and the day it was due, when that is older), then
+ * over it: the day, from today, yesterday and the day it was due, never before that day, then
  * the hour and minute on Mudita's time input, on the 24-hour clock as [TimeDialog] is. It starts
  * at now; a time still to come is refused, and says so.
  */
