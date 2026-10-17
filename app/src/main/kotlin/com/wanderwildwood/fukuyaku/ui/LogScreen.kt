@@ -25,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -92,7 +93,9 @@ fun LogScreen() {
     val summaries = remember(list) { summaries(list, today, zone, now) }
     val byDay = remember(list) { list.groupBy { Times.date(it.due) }.toSortedMap(compareByDescending { it }) }
 
-    LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
+    // Every dose ever logged: page dots down the edge once it runs past three screens.
+    val state = rememberLazyListState()
+    ListJumpBox(state, ListJump.Pages) { LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), state = state, isScrollbarVisible = false) {
         if (list.isEmpty()) {
             item(key = "empty") {
                 TextMMD(
@@ -146,7 +149,7 @@ fun LogScreen() {
             }
         }
         item(key = "foot") { Spacer(Modifier.height(24.dp)) }
-    }
+    } }
 
     chosen?.let { d -> DoseDialog(d, now, onDismiss = { chosen = null }) }
 }

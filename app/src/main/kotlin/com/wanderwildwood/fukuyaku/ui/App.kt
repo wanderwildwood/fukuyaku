@@ -17,8 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.mudita.mmd.components.tabs.PrimaryTabRowMMD
-import com.mudita.mmd.components.tabs.TabMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.fukuyaku.R
@@ -84,21 +82,11 @@ private fun MainScreen(
         },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
-            PrimaryTabRowMMD(selectedTabIndex = tab) {
-                listOf(R.string.tab_today, R.string.tab_medicines, R.string.tab_log).forEachIndexed { i, label ->
-                    TabMMD(
-                        selected = tab == i,
-                        onClick = { onTab(i) },
-                        text = {
-                            TextMMD(
-                                text = stringResource(label),
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = if (tab == i) FontWeight.Bold else FontWeight.Normal,
-                            )
-                        },
-                    )
-                }
-            }
+            StoneTabs(
+                listOf(R.string.tab_today, R.string.tab_medicines, R.string.tab_log).map { stringResource(it) },
+                tab,
+                onTab,
+            )
             when (tab) {
                 0 -> TodayScreen(onAdd = { onEdit(NEW) }, onEdit = onEdit)
                 1 -> MedicinesScreen(onAdd = { onEdit(NEW) }, onEdit = onEdit)
