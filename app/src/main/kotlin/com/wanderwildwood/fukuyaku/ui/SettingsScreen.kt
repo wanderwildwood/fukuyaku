@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.fukuyaku.R
@@ -75,7 +74,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
             )
         },
     ) { padding ->
-        LazyColumnMMD(modifier = Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
+        PagedColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp)) {
             item { Spacer(Modifier.height(8.dp)) }
             problems.forEachIndexed { i, p -> item(key = "problem:$i") { ProblemCard(p) } }
 
@@ -129,7 +128,6 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                     Reminders.sync(context)
                 }
             }
-            item { Spacer(Modifier.height(24.dp)) }
         }
     }
 

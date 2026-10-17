@@ -1,5 +1,6 @@
 package com.wanderwildwood.fukuyaku.alarm
 
+import com.wanderwildwood.fukuyaku.ui.PagedColumn
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,7 +28,6 @@ import com.mudita.mmd.ThemeMMD
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
@@ -73,7 +73,7 @@ private fun Ringing(onDone: () -> Unit) {
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp)) {
         TextMMD(text = stringResource(R.string.ringing_title), style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(8.dp))
-        LazyColumnMMD(modifier = Modifier.weight(1f).fillMaxWidth(), isScrollbarVisible = false) {
+        PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
             if (test) {
                 item(key = "test") {
                     Column(Modifier.padding(vertical = 12.dp)) {

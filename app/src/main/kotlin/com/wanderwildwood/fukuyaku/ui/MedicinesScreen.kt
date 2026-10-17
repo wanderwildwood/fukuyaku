@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.data.Medicine
@@ -32,7 +31,7 @@ fun MedicinesScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
     val version by Store.version.collectAsState()
     val medicines = remember(version) { Store.get(context).medicines() }
 
-    LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
+    PagedColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
         item(key = "add") {
             OutlinedButtonMMD(onClick = onAdd, modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp).height(48.dp)) {
                 TextMMD(text = stringResource(R.string.add_medicine), style = MaterialTheme.typography.bodyMedium)
@@ -44,7 +43,6 @@ fun MedicinesScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
                 HorizontalDividerMMD()
             }
         }
-        item(key = "foot") { Spacer(Modifier.height(24.dp)) }
     }
 }
 

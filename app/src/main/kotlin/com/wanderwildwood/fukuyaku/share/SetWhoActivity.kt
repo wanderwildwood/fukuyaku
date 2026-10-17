@@ -1,5 +1,6 @@
 package com.wanderwildwood.fukuyaku.share
 
+import com.wanderwildwood.fukuyaku.ui.PagedColumn
 import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
@@ -25,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.mudita.mmd.ThemeMMD
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.alarm.Reminders
@@ -90,7 +90,7 @@ abstract class SetWhoActivity(
                             text = stringResource(if (medicines.isEmpty()) none else ask),
                             style = MaterialTheme.typography.bodyMedium,
                         )
-                        LazyColumnMMD(modifier = Modifier.weight(1f).fillMaxWidth(), isScrollbarVisible = false) {
+                        PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
                             medicines.forEach { m ->
                                 item(key = m.id) {
                                     val now = current(m).takeIf { it.isNotBlank() && it != given.name.ifBlank { given.number } }

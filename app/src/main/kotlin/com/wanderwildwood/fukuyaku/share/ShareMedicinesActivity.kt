@@ -1,5 +1,6 @@
 package com.wanderwildwood.fukuyaku.share
 
+import com.wanderwildwood.fukuyaku.ui.PagedColumn
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -21,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.mudita.mmd.ThemeMMD
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.data.Days
@@ -64,7 +64,7 @@ class ShareMedicinesActivity : ComponentActivity() {
                             },
                             style = MaterialTheme.typography.bodyMedium,
                         )
-                        LazyColumnMMD(modifier = Modifier.weight(1f).fillMaxWidth(), isScrollbarVisible = false) {
+                        PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
                             lines.forEachIndexed { i, line ->
                                 item(key = i) {
                                     TextMMD(text = line, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))

@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.fukuyaku.R
@@ -169,7 +168,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
             )
         },
     ) { padding ->
-        LazyColumnMMD(modifier = Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
+        PagedColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp)) {
             problem?.let { p ->
                 item(key = "problem") {
                     TextMMD(
@@ -342,7 +341,6 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                     }
                 }
             }
-            item(key = "foot") { Spacer(Modifier.height(24.dp)) }
         }
     }
 

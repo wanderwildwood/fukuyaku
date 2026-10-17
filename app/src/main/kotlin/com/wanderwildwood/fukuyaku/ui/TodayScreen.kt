@@ -24,7 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
@@ -97,7 +96,7 @@ fun TodayScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
     // The dose taken when needed is being given an earlier time than now.
     var takingEarlier by remember(taking) { mutableStateOf(false) }
 
-    LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), isScrollbarVisible = false) {
+    PagedColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
         item(key = "top") { Spacer(Modifier.height(8.dp)) }
         problems.forEachIndexed { i, p -> item(key = "problem:$i") { ProblemCard(p) } }
 
@@ -175,7 +174,6 @@ fun TodayScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
                 }
             }
         }
-        item(key = "foot") { Spacer(Modifier.height(24.dp)) }
     }
 
     chosen?.let { l ->

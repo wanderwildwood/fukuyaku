@@ -35,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
@@ -95,7 +94,7 @@ fun LogScreen() {
 
     // Every dose ever logged: page dots down the edge once it runs past three screens.
     val state = rememberLazyListState()
-    ListJumpBox(state, ListJump.Pages) { LazyColumnMMD(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), state = state, isScrollbarVisible = false) {
+    ListJumpBox(state, ListJump.Pages) { PagedColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), state = state) {
         if (list.isEmpty()) {
             item(key = "empty") {
                 TextMMD(
@@ -104,7 +103,7 @@ fun LogScreen() {
                     modifier = Modifier.padding(vertical = 16.dp),
                 )
             }
-            return@LazyColumnMMD
+            return@PagedColumn
         }
         for (s in summaries) {
             item(key = "sum:${s.name}") { SummaryBlock(s) }
@@ -148,7 +147,6 @@ fun LogScreen() {
                 }
             }
         }
-        item(key = "foot") { Spacer(Modifier.height(24.dp)) }
     } }
 
     chosen?.let { d -> DoseDialog(d, now, onDismiss = { chosen = null }) }
