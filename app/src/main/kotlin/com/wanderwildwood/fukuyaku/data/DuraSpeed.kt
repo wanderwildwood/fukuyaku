@@ -5,7 +5,6 @@ import android.app.ApplicationExitInfo
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings as AndroidSettings
 import com.wanderwildwood.fukuyaku.BuildConfig
 import java.io.File
@@ -27,11 +26,13 @@ object DuraSpeed {
     private const val PACKAGE = "com.mediatek.duraspeed"
 
     /**
-     * A Kompakt, or, in a debug build only, an emulator told to act as one by a file named
-     * `pretend-kompakt` in the app's files, so the setup step can be seen without the phone.
+     * DuraSpeed is on this phone, or, in a debug build only, an emulator is told to act as one by
+     * a file named `pretend-kompakt` in the app's files, so the setup step can be seen without the
+     * phone. Asked of the package itself, not the maker's name: a Kompakt running another system
+     * (KompaktOS) still says Mudita and has no DuraSpeed.
      */
     fun isKompakt(context: Context): Boolean =
-        Build.MANUFACTURER.equals("Mudita", ignoreCase = true) ||
+        runCatching { context.packageManager.getApplicationInfo(PACKAGE, 0); true }.getOrDefault(false) ||
             (BuildConfig.DEBUG && File(context.filesDir, "pretend-kompakt").exists())
 
     /** DuraSpeed's own switch; null where the phone does not say. */

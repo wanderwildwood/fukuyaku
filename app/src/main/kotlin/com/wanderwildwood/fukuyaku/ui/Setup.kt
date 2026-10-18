@@ -75,6 +75,18 @@ fun problems(context: Context, settings: Settings, onChange: () -> Unit): List<P
             },
         )
     }
+    // Android 14 on takes this away from an app installed from a file; only asked while it is wanted.
+    if (settings.fullScreen && android.os.Build.VERSION.SDK_INT >= 34 &&
+        !context.getSystemService(NotificationManager::class.java).canUseFullScreenIntent()
+    ) {
+        out += Problem(
+            text = context.getString(R.string.setup_full_screen),
+            button = context.getString(R.string.setup_allow_full_screen),
+            action = {
+                open(Intent(AndroidSettings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT, Uri.parse("package:" + context.packageName)))
+            },
+        )
+    }
     val stopped = settings.stoppedAt
     if (stopped > 0) {
         out += Problem(

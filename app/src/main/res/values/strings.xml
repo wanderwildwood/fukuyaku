@@ -80,6 +80,8 @@
     <string name="setup_turn_on">Turn them on</string>
     <string name="setup_exact">Medicine is not allowed to set alarms, so a reminder can come up to an hour late.</string>
     <string name="setup_allow">Allow alarms</string>
+    <string name="setup_full_screen">Medicine is not allowed to fill the screen, so a reminder shows only as a notification and does not wake the phone.</string>
+    <string name="setup_allow_full_screen">Allow full screen</string>
     <!-- %1$s is when, e.g. "14:02" or "Yesterday 14:02" -->
     <string name="setup_stopped">Medicine was stopped (%1$s), and no reminder could ring until it was opened again. Anything due in that time is in the log as not marked.</string>
     <string name="setup_understood">Understood</string>
