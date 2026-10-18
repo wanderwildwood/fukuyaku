@@ -54,6 +54,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     val again = remember(v) { s.againMinutes }
     val fullScreen = remember(v) { s.fullScreen }
     val glance = remember(v) { s.onLockScreen }
+    val jumpShown by rememberListJumpShown()
     val testAt = remember(v, check) { s.testAt }
     // Once the test has rung, the row goes back to saying what it does.
     LaunchedEffect(testAt) {
@@ -111,6 +112,9 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                     GlanceProvider.changed(context)
                     v++
                 }
+            }
+            item(key = "listjump") {
+                SwitchRow(stringResource(R.string.list_jump_setting), jumpShown) { ListJumpPrefs.setShown(context, it) }
             }
             item(key = "test") {
                 SettingRow(
