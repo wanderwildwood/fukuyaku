@@ -15,7 +15,7 @@ ships with.
 | | |
 |---|---|
 | ![Today's doses, one taken and one not yet](screenshots/1-today.png) | ![A reminder over the lock screen](screenshots/2-reminder.png) |
-| ![A medicine's page: times, what is left, the pharmacy](screenshots/3-medicine.png) | ![The log, with the last fortnight](screenshots/4-log.png) |
+| ![A medicine's page: how long what is left lasts, the pharmacy](screenshots/3-medicine.png) | ![The log, with the last fortnight](screenshots/4-log.png) |
 
 ## What it does
 
