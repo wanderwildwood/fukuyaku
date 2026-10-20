@@ -54,6 +54,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     val again = remember(v) { s.againMinutes }
     val fullScreen = remember(v) { s.fullScreen }
     val glance = remember(v) { s.onLockScreen }
+    val alarmClock = remember(v) { s.asAlarmClock }
     val jumpShown by rememberListJumpShown()
     val testAt = remember(v, check) { s.testAt }
     // Once the test has rung, the row goes back to saying what it does.
@@ -91,6 +92,13 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
             item(key = "full") {
                 SwitchRow(stringResource(R.string.settings_full_screen), fullScreen) {
                     s.fullScreen = it
+                    v++
+                }
+            }
+            item(key = "alarm_clock") {
+                SwitchRow(stringResource(R.string.settings_alarm_clock), alarmClock, note = stringResource(R.string.settings_alarm_clock_note)) {
+                    s.asAlarmClock = it
+                    Reminders.reschedule(context)
                     v++
                 }
             }

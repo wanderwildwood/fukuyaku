@@ -21,6 +21,11 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("full_screen", true)
         set(v) = prefs.edit().putBoolean("full_screen", v).apply()
 
+    /** The next dose is set as the phone's next alarm, with the system's alarm bell; off, it is a plain exact alarm. */
+    var asAlarmClock: Boolean
+        get() = prefs.getBoolean("alarm_clock", true)
+        set(v) = prefs.edit().putBoolean("alarm_clock", v).apply()
+
     /** The next dose on Glance's lock-screen panel. Off until asked for: it names medicines. */
     var onLockScreen: Boolean
         get() = prefs.getBoolean("glance", false)

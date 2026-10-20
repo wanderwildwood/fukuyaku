@@ -283,6 +283,9 @@
     <!-- %1$s is a length of time, e.g. "30 minutes" -->
     <string name="settings_again_after">Ring again after %1$s, up to 3 times</string>
     <string name="settings_full_screen">Fill the screen when a reminder rings</string>
+    <!-- The system's alarm bell, at the top of the screen and over the home screen's clock -->
+    <string name="settings_alarm_clock">Show the next dose as an alarm</string>
+    <string name="settings_alarm_clock_note">Android\'s alarm bell shows at the top of the screen until the next dose. Off, doses still ring on time, without the bell.</string>
     <string name="settings_sound">Sound and vibration</string>
     <string name="settings_glance">Next dose on the lock screen</string>
     <string name="settings_glance_note">Shown by Glance, when it is installed. It names medicines to anyone who picks up the phone.</string>

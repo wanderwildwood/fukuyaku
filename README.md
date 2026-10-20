@@ -55,7 +55,8 @@ DuraSpeed stops the app again later, the step comes back.
   how much and when is for a doctor or a pharmacist to say.
 - **Nothing leaves the phone.** The app has no internet permission. See [PRIVACY.md](PRIVACY.md).
 - **The phone's alarm icon shows the next reminder**, as it does for an alarm clock: that is the
-  kind of alarm that rings on time whatever the phone is saving power for.
+  kind of alarm that rings on time whatever the phone is saving power for. To hide the bell,
+  switch off **Show the next dose as an alarm** in Settings; doses still ring on time.
 - **After the phone restarts**, reminders start again once the phone is unlocked; anything due
   before then is in the log, and the newest one rings.
 - **Times are clock times**, in whichever time zone the phone is in: 08:00 stays 08:00 across a

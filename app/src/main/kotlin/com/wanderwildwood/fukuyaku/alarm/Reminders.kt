@@ -115,10 +115,16 @@ object Reminders {
             return
         }
         val at = maxOf(wake, now + 1_000L)
-        if (am.canScheduleExactAlarms()) {
+        if (am.canScheduleExactAlarms() && settings.asAlarmClock) {
             // An alarm clock is exact, is let through Doze, and wakes the phone early to deliver it.
+            // It is also the phone's next alarm: the system shows its bell until it rings.
             am.setAlarmClock(AlarmManager.AlarmClockInfo(at, open(context)), pending)
             Log.i(TAG, "alarm clock set for $at")
+        } else if (am.canScheduleExactAlarms()) {
+            // Asked not to be the phone's next alarm, so no bell: still exact, and still let
+            // through Doze, though Doze may hold it a few minutes when alarms come close together.
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pending)
+            Log.i(TAG, "exact alarm set for $at")
         } else {
             // Without the permission an exact alarm cannot be set at all. This one may come some
             // minutes late; the first screen says so and offers the permission.
