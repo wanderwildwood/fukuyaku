@@ -61,7 +61,7 @@ import java.time.ZoneId
 /**
  * A medicine's page, new or existing: its name, when it is taken, what is left of it, its
  * pharmacy, its doctor, notes. Back saves it, as Save does. When it cannot be saved yet the page says
- * why, and a second Back within four seconds leaves without saving.
+ * why, and a second Back within six seconds leaves without saving.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,7 +94,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
 
     LaunchedEffect(leaving) {
         if (leaving) {
-            delay(4000)
+            delay(6000)
             leaving = false
         }
     }
@@ -274,18 +274,21 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                             OutlinedButtonMMD(
                                 onClick = {
                                     val on = LocalDate.now().plusDays(maxOf(0, days - 3).toLong())
-                                    val begin = on.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                                    // A plain timed event, 09:00 for half an hour, the shape every calendar takes; an
+                                    // all-day one with its own time-zone rules is what Mudita's calendar choked on.
+                                    val begin = on.atTime(9, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                                    // Nothing typed here is lost on the way out: it is saved as Back would.
+                                    if (d.problem() == null) Reminders.save(context, d.toMedicine(original))
                                     open(
-                                        Intent(Intent.ACTION_INSERT)
-                                            .setData(CalendarContract.Events.CONTENT_URI)
+                                        Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI)
+                                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                             .putExtra(CalendarContract.Events.TITLE, context.getString(R.string.refill_event_title, counted.name))
                                             .putExtra(
                                                 CalendarContract.Events.DESCRIPTION,
                                                 context.resources.getQuantityString(R.plurals.refill_event_text, counted.left ?: 0, (counted.left ?: 0).toString(), Times.day(context, LocalDate.now())),
                                             )
-                                            .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true)
                                             .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, begin)
-                                            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, begin + 86_400_000L),
+                                            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, begin + 30 * 60_000L),
                                         R.string.no_calendar,
                                     )
                                 },

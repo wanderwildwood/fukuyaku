@@ -250,6 +250,7 @@
     <string name="action_snooze">Snooze %1$s min</string>
     <string name="action_snooze_all">Snooze all, %1$s min</string>
     <string name="ringing_title">Medicine</string>
+    <string name="ringing_none">Nothing is ringing now.</string>
     <string name="ringing_later">Answer later</string>
     <!-- %1$s is a medicine -->
     <string name="refill_title">%1$s is running low</string>

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -32,6 +31,7 @@ import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
 import com.wanderwildwood.fukuyaku.data.Dose
+import com.wanderwildwood.fukuyaku.data.Plan
 import com.wanderwildwood.fukuyaku.data.Settings
 import com.wanderwildwood.fukuyaku.data.Status
 import com.wanderwildwood.fukuyaku.data.Store
@@ -65,10 +65,19 @@ private fun Ringing(onDone: () -> Unit) {
     val settings = remember { Settings(context) }
     val ids = remember(version) { Notifier.ringing(context) }
     val doses = remember(version) {
-        Store.get(context).open().filter { it.id.toInt() in ids }
+        val open = Store.get(context).open()
+        // What the notifications say is ringing. Some phones take the notification away as the
+        // screen is opened (Mudita's does), and a screen that closes itself when it finds none
+        // was gone in a fraction of a second; so the log answers too: what rang lately and is
+        // still not marked, the newest of each medicine, as after a restart.
+        open.filter { it.id.toInt() in ids }.ifEmpty {
+            val now = System.currentTimeMillis()
+            open.filter { it.rang != null && now - it.due <= Plan.RING_WITHIN_MS }
+                .groupBy { it.medicineId }
+                .mapNotNull { (_, those) -> those.maxByOrNull { it.due } }
+        }
     }
     val test = Notifier.TEST_ID in ids
-    LaunchedEffect(doses.isEmpty(), test) { if (doses.isEmpty() && !test) onDone() }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp)) {
         TextMMD(text = stringResource(R.string.ringing_title), style = MaterialTheme.typography.titleLarge)
@@ -85,6 +94,15 @@ private fun Ringing(onDone: () -> Unit) {
             }
             for (d in doses) {
                 item(key = d.id) { RingingDose(d) }
+            }
+            if (doses.isEmpty() && !test) {
+                item(key = "none") {
+                    TextMMD(
+                        text = stringResource(R.string.ringing_none),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(vertical = 12.dp),
+                    )
+                }
             }
         }
         Spacer(Modifier.height(12.dp))
