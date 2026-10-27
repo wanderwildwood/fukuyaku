@@ -85,8 +85,9 @@ fun TodayScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
         if (lines.any { it.dose == null }) null
         else {
             val later = store.between(endOfDay, endOfDay + 8 * 86_400_000L).groupBy({ it.medicineId }, { it.due })
-            medicines.mapNotNull { m -> Plan.nextUnlogged(m, endOfDay - 1, zone, later[m.id].orEmpty().toSet())?.let { it to m } }
-                .minByOrNull { it.first }
+            // Everything due at the soonest time, not one of them.
+            val soonest = medicines.mapNotNull { m -> Plan.nextUnlogged(m, endOfDay - 1, zone, later[m.id].orEmpty().toSet())?.let { it to m } }
+            soonest.minOfOrNull { it.first }?.let { at -> at to soonest.filter { it.first == at }.map { it.second } }
         }
     }
     val asNeeded = medicines.filter { it.schedule is Schedule.AsNeeded && !it.paused }
@@ -149,10 +150,10 @@ fun TodayScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
             }
         }
 
-        next?.let { (at, m) ->
+        next?.let { (at, meds) ->
             item(key = "next") {
                 TextMMD(
-                    text = stringResource(R.string.today_next, Times.whenShort(context, at), m.label),
+                    text = stringResource(R.string.today_next, Times.whenShort(context, at), meds.joinToString("; ") { it.label }),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(vertical = 12.dp),
                 )

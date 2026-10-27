@@ -46,9 +46,12 @@ class ShareMedicinesActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setResult(Activity.RESULT_CANCELED)
         val lines = lines(this)
+        // Named from callingPackage alone: the referrer can be set by whoever asks. With no
+        // caller there is nobody to hand the list to, so Share is not offered.
         val asker = callingPackage?.let { pkg ->
-            runCatching { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() }.getOrNull()
+            runCatching { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() }.getOrNull() ?: pkg
         }
+        val canShare = asker != null
         setContent {
             ThemeMMD(colorScheme = monochrome) {
                 BackHandler { finish() }
@@ -71,7 +74,7 @@ class ShareMedicinesActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        if (lines.isNotEmpty()) {
+                        if (lines.isNotEmpty() && canShare) {
                             ButtonMMD(
                                 onClick = {
                                     setResult(Activity.RESULT_OK, Intent().putExtra(Intent.EXTRA_TEXT, lines.joinToString("\n")))
@@ -86,7 +89,7 @@ class ShareMedicinesActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxWidth().height(56.dp),
                         ) {
                             TextMMD(
-                                text = stringResource(if (lines.isEmpty()) R.string.close else R.string.share_no),
+                                text = stringResource(if (lines.isEmpty() || !canShare) R.string.close else R.string.share_no),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                         }

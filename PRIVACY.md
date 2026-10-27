@@ -47,7 +47,8 @@ the medicines.
 Another app can ask for the list of medicines (names, amounts and when they are taken, nothing
 from the log). Medicine shows you the list and the asking app's name first, and hands it over only
 when you press **Share** (`share/ShareMedicinesActivity.kt`). There is no way to read it
-without that press.
+without that press. The asking app is named from the system's record of who started the
+screen; when there is none, nothing can receive the list and Share is not offered.
 
 ## The lock screen
 
@@ -59,6 +60,11 @@ hands Glance the next dose and any dose not yet marked — medicine names and ti
 the lock screen, where anyone holding the phone can read them. It is off until you turn it on.
 It answers Glance alone, through a provider every other app is refused by
 (`glance/GlanceProvider.kt`). Nothing leaves the phone.
+
+## Not medical advice
+
+Medicine is a record-keeping aid. It does not diagnose, treat or replace a doctor or pharmacist;
+check doses and dates with them. The same words are in the app's About.
 
 ## No analytics
 

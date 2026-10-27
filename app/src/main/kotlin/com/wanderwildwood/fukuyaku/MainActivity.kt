@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import com.mudita.mmd.ThemeMMD
 import com.wanderwildwood.fukuyaku.alarm.Notifier
 import com.wanderwildwood.fukuyaku.alarm.Reminders
@@ -22,7 +24,10 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState == null) opening.value = medicineIn(intent)
         setContent {
             ThemeMMD(colorScheme = monochrome) {
-                MedicineApp(opening = opening.value, onOpened = { opening.value = null })
+                // A blinking cursor redraws the screen twice a second for nothing, on e-ink.
+                CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
+                    MedicineApp(opening = opening.value, onOpened = { opening.value = null })
+                }
             }
         }
     }

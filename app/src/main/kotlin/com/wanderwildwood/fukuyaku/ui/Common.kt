@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -90,8 +91,8 @@ fun ChoiceRow(title: String, chosen: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 4.dp),
+            .heightIn(min = 48.dp)
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButtonMMD(selected = chosen, onClick = null)
@@ -106,8 +107,8 @@ fun CheckRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onChange(!checked) }
-            .padding(vertical = 2.dp),
+            .heightIn(min = 48.dp)
+            .clickable { onChange(!checked) },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CheckboxMMD(checked = checked, onCheckedChange = onChange)

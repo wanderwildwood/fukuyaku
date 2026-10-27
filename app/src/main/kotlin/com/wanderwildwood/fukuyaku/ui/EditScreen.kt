@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,6 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -76,6 +80,20 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
     var pickTime by remember { mutableStateOf<Int?>(null) }
     var pickHoursFrom by remember { mutableStateOf(false) }
     var pickFrom by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    // Counts failed saves, so the page scrolls up to the reason each time, even from the foot.
+    var refused by remember { mutableIntStateOf(0) }
+    LaunchedEffect(refused) {
+        if (refused > 0) listState.scrollToItem(0)
+    }
+    // A picker takes the keys, so the field that had them lets go first; otherwise the Name
+    // field gets them back, and the keyboard with it, when the picker closes.
+    val focus = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
+    fun letGo() {
+        focus.clearFocus(force = true)
+        keyboard?.hide()
+    }
 
     // A pharmacy or doctor set from Contacts while this page was open underneath comes into
     // the page, unless that one was changed by hand here meanwhile, so Back does not undo it.
@@ -103,6 +121,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
         val p = d.problem()
         if (p != null) {
             problem = p
+            refused++
             return false
         }
         Reminders.save(context, d.toMedicine(original))
@@ -168,7 +187,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
             )
         },
     ) { padding ->
-        PagedColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp)) {
+        PagedColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(horizontal = 20.dp), state = listState) {
             problem?.let { p ->
                 item(key = "problem") {
                     TextMMD(
@@ -200,7 +219,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                                 TextMMD(
                                     text = Times.time(context, t),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.weight(1f).clickable { pickTime = i }.padding(vertical = 10.dp),
+                                    modifier = Modifier.weight(1f).clickable { letGo(); pickTime = i }.padding(vertical = 10.dp),
                                 )
                                 BarButton(Icons.Close, stringResource(R.string.cd_remove_time)) {
                                     d = d.copy(times = d.times.filterIndexed { j, _ -> j != i })
@@ -209,7 +228,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                         }
                     }
                     item(key = "add time") {
-                        SettingRow(stringResource(R.string.edit_add_time), null) { pickTime = -1 }
+                        SettingRow(stringResource(R.string.edit_add_time), null) { letGo(); pickTime = -1 }
                     }
                     item(key = "days") { Heading(stringResource(R.string.edit_days)) }
                     item(key = "d1") { ChoiceRow(stringResource(R.string.edit_days_every), d.dayKind == DayKind.EVERY) { d = d.copy(dayKind = DayKind.EVERY) } }
@@ -223,7 +242,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                             Field(stringResource(R.string.edit_every_n), d.everyN, { d = d.copy(everyN = it.filter(Char::isDigit).take(3)) }, number = true)
                         }
                         item(key = "from") {
-                            SettingRow(stringResource(R.string.edit_starting), Times.day(context, d.from)) { pickFrom = true }
+                            SettingRow(stringResource(R.string.edit_starting), Times.day(context, d.from)) { letGo(); pickFrom = true }
                         }
                     }
                 }
@@ -232,7 +251,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                         Field(stringResource(R.string.edit_hours), d.hours, { d = d.copy(hours = it.filter(Char::isDigit).take(3)) }, number = true)
                     }
                     item(key = "hours from") {
-                        SettingRow(stringResource(R.string.edit_first_dose), Times.time(context, d.hoursFrom)) { pickHoursFrom = true }
+                        SettingRow(stringResource(R.string.edit_first_dose), Times.time(context, d.hoursFrom)) { letGo(); pickHoursFrom = true }
                     }
                     item(key = "hours note") {
                         TextMMD(text = stringResource(R.string.edit_hours_note), style = MaterialTheme.typography.labelSmall)
@@ -455,7 +474,7 @@ private fun WeekPicker(chosen: Set<DayOfWeek>, onChange: (Set<DayOfWeek>) -> Uni
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .weight(1f)
-                    .height(44.dp)
+                    .height(48.dp)
                     .border(BorderStroke(2.dp, ink), RoundedCornerShape(8.dp))
                     .background(if (on) ink else paper, RoundedCornerShape(8.dp))
                     .clickable { onChange(if (on) chosen - day else chosen + day) },

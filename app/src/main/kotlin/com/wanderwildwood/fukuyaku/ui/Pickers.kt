@@ -35,9 +35,7 @@ import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.time.DatePickerFormatterMMD
 import com.mudita.mmd.components.time.DatePickerMMD
-import com.mudita.mmd.components.time.TimeInputMMD
 import com.mudita.mmd.components.time.rememberDatePickerMMDState
-import com.mudita.mmd.components.time.rememberTimeInputMMDState
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
 import com.wanderwildwood.fukuyaku.data.Plan
@@ -49,19 +47,20 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 
 /**
- * Mudita's time input: the hour and the minute typed, the way the Kompakt's own clock sets
- * them. Always on the 24-hour clock, whatever the phone uses: in 12-hour mode MMD 1.0.2 sets a
- * typed hour as it stands, so "6" with PM showing came out as 6 in the morning.
+ * The hour and the minute typed in two plain boxes ([TimeBoxes]). Always on the 24-hour clock,
+ * whatever the phone uses: in 12-hour mode MMD's input set a typed hour as it stands, so "6"
+ * with PM showing came out as 6 in the morning.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimeDialog(initial: LocalTime, onPick: (LocalTime) -> Unit, onDismiss: () -> Unit) {
-    val state = rememberTimeInputMMDState(initialHour = initial.hour, initialMinute = initial.minute, is24Hour = true)
+    var hour by remember { mutableStateOf(initial.hour) }
+    var minute by remember { mutableStateOf(initial.minute) }
     EInkDialog(onDismiss = onDismiss) {
-        TimeInputMMD(state = state, modifier = Modifier.align(Alignment.CenterHorizontally))
+        TimeBoxes(hour, minute, { h, m -> hour = h; minute = m })
         Spacer(Modifier.height(8.dp))
         DialogButtons(onCancel = onDismiss, onOk = {
-            onPick(LocalTime.of(state.hour, state.minute))
+            onPick(LocalTime.of(hour, minute))
             onDismiss()
         })
     }
@@ -82,7 +81,8 @@ fun ColumnScope.TakenAtPicker(due: Long?, onPick: (Long) -> Unit, onCancel: () -
     val days = remember { Plan.takenDays(now.toLocalDate(), due?.let { Times.date(it) }) }
     var day by remember { mutableStateOf(days.first()) }
     var ahead by remember { mutableStateOf(false) }
-    val state = rememberTimeInputMMDState(initialHour = now.hour, initialMinute = now.minute, is24Hour = true)
+    var hour by remember { mutableStateOf(now.hour) }
+    var minute by remember { mutableStateOf(now.minute) }
     TextMMD(text = stringResource(R.string.taken_when), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
     Spacer(Modifier.height(4.dp))
     for (d in days) {
@@ -92,7 +92,7 @@ fun ColumnScope.TakenAtPicker(due: Long?, onPick: (Long) -> Unit, onCancel: () -
         }
     }
     Spacer(Modifier.height(8.dp))
-    TimeInputMMD(state = state, modifier = Modifier.align(Alignment.CenterHorizontally))
+    TimeBoxes(hour, minute, { h, m -> hour = h; minute = m })
     if (ahead) {
         TextMMD(
             text = stringResource(R.string.taken_ahead),
@@ -102,7 +102,7 @@ fun ColumnScope.TakenAtPicker(due: Long?, onPick: (Long) -> Unit, onCancel: () -
     }
     Spacer(Modifier.height(8.dp))
     DialogButtons(onCancel = onCancel, onOk = {
-        val at = Plan.takenAt(day, LocalTime.of(state.hour, state.minute), zone, System.currentTimeMillis())
+        val at = Plan.takenAt(day, LocalTime.of(hour, minute), zone, System.currentTimeMillis())
         if (at == null) ahead = true else onPick(at)
     })
 }

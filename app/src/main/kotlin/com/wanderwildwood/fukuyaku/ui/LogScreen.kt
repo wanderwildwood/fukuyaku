@@ -92,9 +92,8 @@ fun LogScreen() {
     val summaries = remember(list) { summaries(list, today, zone, now) }
     val byDay = remember(list) { list.groupBy { Times.date(it.due) }.toSortedMap(compareByDescending { it }) }
 
-    // Every dose ever logged: page dots down the edge once it runs past three screens.
     val state = rememberLazyListState()
-    ListJumpBox(state, ListJump.Pages) { PagedColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), state = state) {
+    PagedColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), state = state) {
         if (list.isEmpty()) {
             item(key = "empty") {
                 TextMMD(
@@ -147,7 +146,7 @@ fun LogScreen() {
                 }
             }
         }
-    } }
+    }
 
     chosen?.let { d -> DoseDialog(d, now, onDismiss = { chosen = null }) }
 }
