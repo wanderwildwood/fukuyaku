@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -78,6 +79,16 @@ private fun Ringing(onDone: () -> Unit) {
         }
     }
     val test = Notifier.TEST_ID in ids
+
+    // The notification stays until the dose is answered. A phone that takes it away as this
+    // screen opens (Mudita's did, and the screen then closed with it) gets it back, quietly,
+    // so the dose can still be answered from the shade after the screen is left.
+    LaunchedEffect(doses.map { it.id }, ids) {
+        val store = Store.get(context)
+        doses.filter { it.id.toInt() !in ids }.forEach {
+            Notifier.dose(context, settings, it, store.medicine(it.medicineId), quiet = true)
+        }
+    }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp)) {
         TextMMD(text = stringResource(R.string.ringing_title), style = MaterialTheme.typography.titleLarge)

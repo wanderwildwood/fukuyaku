@@ -36,7 +36,7 @@ import com.wanderwildwood.fukuyaku.R
  * nothing leaves the phone, and that a reminder is not advice.
  */
 @Composable
-fun AboutDialog(onDismiss: () -> Unit) {
+fun AboutDialog(onDismiss: () -> Unit, onLicences: () -> Unit = {}) {
     // The dialog cannot scroll, so the text pages inside a box of fixed height and Close stays
     // under it.
     val room = LocalConfiguration.current.screenHeightDp.dp * 0.62f
@@ -60,10 +60,13 @@ fun AboutDialog(onDismiss: () -> Unit) {
             item(key = "terms") { AboutPart(R.string.about_terms_head, R.string.about_terms) }
             item(key = "disclaimer") { AboutPart(R.string.about_disclaimer_head, R.string.about_disclaimer) }
             item(key = "licence") {
-                Column(Modifier.padding(top = 14.dp)) {
-                    TextMMD(text = stringResource(R.string.about_licence), style = MaterialTheme.typography.labelSmall)
-                    TextMMD(text = stringResource(R.string.about_icons), style = MaterialTheme.typography.labelSmall)
-                }
+                TextMMD(
+                    text = stringResource(R.string.about_licences),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 14.dp).fillMaxWidth().heightIn(min = 48.dp)
+                        .clickable(onClick = onLicences).wrapContentHeight(Alignment.CenterVertically),
+                )
             }
             item(key = "source") {
                 TextMMD(

@@ -75,6 +75,10 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
     val original = remember(id) { if (id == NEW) null else store.medicine(id) }
     val start = remember(original) { Draft.of(original) }
     var d by rememberSaveable(id, stateSaver = Draft.saver) { mutableStateOf(start) }
+    // A new medicine saved on the way to the calendar has its number from then on, so Back
+    // saves that same medicine again instead of adding a second.
+    var savedId by rememberSaveable(id) { mutableStateOf(0L) }
+    fun base(): Medicine? = original ?: savedId.takeIf { it != 0L }?.let { store.medicine(it) }
     var problem by remember { mutableStateOf<Int?>(null) }
     var leaving by remember { mutableStateOf(false) }
     var pickTime by remember { mutableStateOf<Int?>(null) }
@@ -124,7 +128,8 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
             refused++
             return false
         }
-        Reminders.save(context, d.toMedicine(original))
+        val saved = Reminders.save(context, d.toMedicine(base()))
+        if (original == null) savedId = saved
         return true
     }
 
@@ -280,7 +285,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                 item(key = "warn") {
                     Field(stringResource(R.string.edit_warn_at), d.warnAt, { d = d.copy(warnAt = it.filter(Char::isDigit).take(5)) }, number = true, hint = stringResource(R.string.edit_warn_hint))
                 }
-                val counted = if (d.problem() == null) d.toMedicine(original) else null
+                val counted = if (d.problem() == null) d.toMedicine(base()) else null
                 val days = counted?.let { Plan.daysLeft(it) }
                 if (counted != null && days != null) {
                     item(key = "lasts") {
@@ -292,27 +297,44 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                             Spacer(Modifier.height(8.dp))
                             OutlinedButtonMMD(
                                 onClick = {
+                                    // Nothing in this hand-off may take the page down: every step is
+                                    // caught, the form is saved first, and a calendar that cannot take
+                                    // the event is said so in words with the date copied instead.
                                     val on = LocalDate.now().plusDays(maxOf(0, days - 3).toLong())
-                                    // A plain timed event, 09:00 for half an hour, the shape every calendar takes; an
-                                    // all-day one with its own time-zone rules is what Mudita's calendar choked on.
-                                    val begin = on.atTime(9, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                                    // Nothing typed here is lost on the way out: it is saved as Back would.
-                                    if (d.problem() == null) Reminders.save(context, d.toMedicine(original))
-                                    open(
-                                        Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI)
-                                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                            .putExtra(CalendarContract.Events.TITLE, context.getString(R.string.refill_event_title, counted.name))
-                                            .putExtra(
-                                                CalendarContract.Events.DESCRIPTION,
-                                                context.resources.getQuantityString(R.plurals.refill_event_text, counted.left ?: 0, (counted.left ?: 0).toString(), Times.day(context, LocalDate.now())),
-                                            )
-                                            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, begin)
-                                            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, begin + 30 * 60_000L),
-                                        R.string.no_calendar,
-                                    )
+                                    val title = context.getString(R.string.refill_event_title, counted.name)
+                                    val text = context.resources.getQuantityString(R.plurals.refill_event_text, counted.left ?: 0, (counted.left ?: 0).toString(), Times.day(context, LocalDate.now()))
+                                    runCatching { save() }
+                                    val handed = runCatching {
+                                        // A plain timed event, 09:00 for half an hour, the shape every calendar takes; an
+                                        // all-day one with its own time-zone rules is what Mudita's calendar choked on.
+                                        val begin = on.atTime(9, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                                        context.startActivity(
+                                            Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI)
+                                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                                .putExtra(CalendarContract.Events.TITLE, title)
+                                                .putExtra(CalendarContract.Events.DESCRIPTION, text)
+                                                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, begin)
+                                                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, begin + 30 * 60_000L),
+                                        )
+                                    }.isSuccess
+                                    if (!handed) {
+                                        copyRefillDate(context, title, Times.day(context, on))
+                                        Toast.makeText(context, context.getString(R.string.calendar_would_not_take_it), Toast.LENGTH_LONG).show()
+                                    }
                                 },
                                 modifier = Modifier.fillMaxWidth().height(48.dp),
                             ) { TextMMD(text = stringResource(R.string.refill_to_calendar), style = MaterialTheme.typography.bodySmall) }
+                            Spacer(Modifier.height(8.dp))
+                            // The way that cannot fail: if the calendar app crashes on the event,
+                            // the date can still be kept.
+                            OutlinedButtonMMD(
+                                onClick = {
+                                    val on = LocalDate.now().plusDays(maxOf(0, days - 3).toLong())
+                                    copyRefillDate(context, context.getString(R.string.refill_event_title, counted.name), Times.day(context, on))
+                                    Toast.makeText(context, context.getString(R.string.refill_date_copied), Toast.LENGTH_LONG).show()
+                                },
+                                modifier = Modifier.fillMaxWidth().height(48.dp),
+                            ) { TextMMD(text = stringResource(R.string.refill_copy_date), style = MaterialTheme.typography.bodySmall) }
                         }
                     }
                 }
@@ -324,7 +346,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                 who = Pharmacy.of(d),
                 onChange = { d = Pharmacy.into(d, it) },
                 onChoose = { picking = PHARMACY; choose() },
-                textBody = { context.getString(R.string.pharmacy_text_body, d.toMedicine(original).label) },
+                textBody = { context.getString(R.string.pharmacy_text_body, d.toMedicine(base()).label) },
                 open = ::open,
             )
             whoSection(
@@ -333,7 +355,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                 who = Doctor.of(d),
                 onChange = { d = Doctor.into(d, it) },
                 onChoose = { picking = DOCTOR; choose() },
-                textBody = { context.getString(R.string.doctor_text_body, d.toMedicine(original).label) },
+                textBody = { context.getString(R.string.doctor_text_body, d.toMedicine(base()).label) },
                 open = ::open,
             )
 
@@ -487,5 +509,13 @@ private fun WeekPicker(chosen: Set<DayOfWeek>, onChange: (Set<DayOfWeek>) -> Uni
                 )
             }
         }
+    }
+}
+
+/** The refill reminder as text on the clipboard, for a note or any other calendar. */
+private fun copyRefillDate(context: android.content.Context, title: String, day: String) {
+    runCatching {
+        val clip = context.getSystemService(android.content.ClipboardManager::class.java)
+        clip.setPrimaryClip(android.content.ClipData.newPlainText(title, "$title: $day"))
     }
 }

@@ -36,6 +36,11 @@ class Settings(context: Context) {
         get() = prefs.getLong("test_at", 0L)
         set(v) = prefs.edit().putLong("test_at", v).apply()
 
+    /** The first-start notice (a record-keeping aid, not medical advice) has been read. */
+    var disclaimerSeen: Boolean
+        get() = prefs.getBoolean("disclaimer_seen", false)
+        set(v) = prefs.edit().putBoolean("disclaimer_seen", v).apply()
+
     /** The person said Medicine is switched on in DuraSpeed's list. */
     var duraSpeedAllowed: Boolean
         get() = prefs.getBoolean("duraspeed_allowed", false)

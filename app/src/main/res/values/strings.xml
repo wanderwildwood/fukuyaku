@@ -201,6 +201,9 @@
     <string name="edit_needs_per_dose">Each dose needs to use at least 1.</string>
     <string name="edit_back_again">Back again leaves without saving.</string>
 
+    <string name="refill_copy_date">Copy the refill date</string>
+    <string name="refill_date_copied">The refill date is copied. Paste it into a note or a calendar.</string>
+    <string name="calendar_would_not_take_it">The calendar would not take it. The medicine is saved, and the refill date is copied: paste it into a note or a calendar.</string>
     <string name="no_calendar">There is no calendar on this phone to put it in.</string>
     <string name="no_contacts">There is no contacts app on this phone that can be chosen from.</string>
     <string name="no_dialer">There is nothing on this phone to call with.</string>
@@ -316,6 +319,15 @@
     <string name="about_disclaimer_head">Medical disclaimer</string>
     <string name="about_disclaimer">This app is a record-keeping aid, not medical advice. It does not diagnose, treat or replace a doctor or pharmacist. Check doses and dates with them.</string>
     <string name="about_licence">GNU General Public License v3</string>
+    <string name="about_licences">Licences</string>
+    <string name="licences_title">Licences</string>
+    <string name="licences_source">Source code</string>
+    <string name="licences_licence">Licence</string>
+    <string name="licences_licence_body">This app is free software under the GNU General Public License, version 3 only. Copyright wander wildwood. The full text follows.</string>
+    <string name="licences_built_with">Built with</string>
+    <string name="first_run_title">Before you start</string>
+    <string name="about_privacy_short">Everything you put in this app stays on this phone, which it never connects to the internet from. Privacy, Terms and Licences are in About.</string>
+    <string name="first_run_ok">I understand</string>
     <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
     <string name="about_feed_the_llamas">feed the llamas</string>
     <string name="about_no_browser">There is no browser on this phone to open that with.</string>
