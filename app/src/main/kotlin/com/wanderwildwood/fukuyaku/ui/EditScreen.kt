@@ -486,30 +486,15 @@ private fun LazyListScope.whoSection(
 @Composable
 private fun WeekPicker(chosen: Set<DayOfWeek>, onChange: (Set<DayOfWeek>) -> Unit) {
     val context = LocalContext.current
-    val ink = MaterialTheme.colorScheme.onSurface
-    val paper = MaterialTheme.colorScheme.surface
     // Monday first, as ISO counts them; a week that starts on Sunday reads the same set.
-    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth().padding(start = 4.dp, bottom = 8.dp)) {
-        for (day in DayOfWeek.entries) {
-            val on = day in chosen
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp)
-                    .border(BorderStroke(2.dp, ink), RoundedCornerShape(8.dp))
-                    .background(if (on) ink else paper, RoundedCornerShape(8.dp))
-                    .clickable { onChange(if (on) chosen - day else chosen + day) },
-            ) {
-                TextMMD(
-                    text = Words.dayName(context, day).take(2),
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = if (on) FontWeight.Bold else FontWeight.Normal,
-                    color = if (on) paper else ink,
-                )
-            }
-        }
-    }
+    val days = DayOfWeek.entries
+    HouseMultiChoiceRow(
+        options = days.map { Words.dayName(context, it).take(2) },
+        selected = days.indices.filter { days[it] in chosen }.toSet(),
+        onChange = { picked -> onChange(days.filterIndexed { i, _ -> i in picked }.toSet()) },
+        modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
+        compact = true,
+    )
 }
 
 /** The refill reminder as text on the clipboard, for a note or any other calendar. */
