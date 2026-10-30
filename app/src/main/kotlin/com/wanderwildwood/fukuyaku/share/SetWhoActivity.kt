@@ -72,6 +72,10 @@ abstract class SetWhoActivity(
             return
         }
         val medicines = Store.get(this).medicines()
+        // Named from callingPackage alone: the referrer can be set by whoever asks.
+        val asker = callingPackage?.let { pkg ->
+            runCatching { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() }.getOrNull() ?: pkg
+        }
         setContent {
             ThemeMMD(colorScheme = monochrome) {
                 BackHandler { finish() }
@@ -84,6 +88,11 @@ abstract class SetWhoActivity(
                             text = listOf(given.name, given.number).filter { it.isNotEmpty() }.joinToString("  "),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        TextMMD(
+                            text = if (asker != null) stringResource(R.string.set_from, asker) else stringResource(R.string.set_from_unknown),
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                         Spacer(Modifier.height(8.dp))
                         TextMMD(

@@ -67,13 +67,8 @@ private fun rawText(context: Context, @RawRes id: Int): List<String> =
     licenceParagraphs(context.resources.openRawResource(id).bufferedReader().use { it.readText() })
 
 /** Opens an address; with no browser installed it says so in words instead of failing. */
-fun openLink(context: Context, address: String) {
-    try {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(address)))
-    } catch (_: Exception) {
-        Toast.makeText(context, context.getString(R.string.about_no_browser), Toast.LENGTH_LONG).show()
-    }
-}
+fun openLink(context: Context, address: String) =
+    openLink(context, address, context.getString(R.string.about_no_browser_address, address.removePrefix("https://")))
 
 /**
  * Where the source is, which licence the app is under with its full text, and what it is built

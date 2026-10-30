@@ -166,6 +166,8 @@
     <string name="pharmacy_text_body">Refill: %1$s</string>
     <string name="pharmacy_unreadable">That contact could not be read. Type the name and number instead.</string>
     <!-- A pharmacy sent from Contacts: which medicines it is for -->
+    <string name="set_from">Asked by %1$s.</string>
+    <string name="set_from_unknown">Asked by an app that did not give its name.</string>
     <string name="pharmacy_set_ask">Make this the pharmacy for the medicines ticked here?</string>
     <string name="pharmacy_set_none">No medicines are set up yet. Add one first; its page can choose this pharmacy from Contacts.</string>
     <string name="pharmacy_set_yes">Set pharmacy</string>
@@ -330,6 +332,7 @@
     <string name="first_run_ok">I understand</string>
     <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
     <string name="about_feed_the_llamas">feed the llamas</string>
+    <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
     <string name="about_no_browser">There is no browser on this phone to open that with.</string>
     <string name="about_close">Close</string>
     <!-- The folio at the foot of a paged list, "2 / 6"; a tap on it asks for a page -->
