@@ -93,7 +93,7 @@ fun LogScreen() {
     val byDay = remember(list) { list.groupBy { Times.date(it.due) }.toSortedMap(compareByDescending { it }) }
 
     val state = rememberLazyListState()
-    PagedColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp), state = state) {
+    PagedColumn(modifier = Modifier.fillMaxSize(), state = state, contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp)) {
         if (list.isEmpty()) {
             item(key = "empty") {
                 TextMMD(

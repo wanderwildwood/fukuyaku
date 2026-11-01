@@ -31,7 +31,7 @@ fun MedicinesScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
     val version by Store.version.collectAsState()
     val medicines = remember(version) { Store.get(context).medicines() }
 
-    PagedColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
+    PagedColumn(modifier = Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp)) {
         item(key = "add") {
             OutlinedButtonMMD(onClick = onAdd, modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp).height(48.dp)) {
                 TextMMD(text = stringResource(R.string.add_medicine), style = MaterialTheme.typography.bodyMedium)

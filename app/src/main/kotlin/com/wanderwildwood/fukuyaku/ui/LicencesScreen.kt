@@ -82,7 +82,7 @@ fun LicencesScreen(onClose: () -> Unit) {
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
         TopAppBarMMD(title = { TextMMD(stringResource(R.string.licences_title)) })
         Box(Modifier.weight(1f)) {
-            PagedColumn(Modifier.padding(horizontal = 16.dp)) {
+            PagedColumn(Modifier, contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 12.dp)) {
                 item { Head(stringResource(R.string.licences_source)) }
                 item {
                     TextMMD(

@@ -68,11 +68,11 @@ DuraSpeed stops the app again later, the step comes back.
 - **Glance** ([hitome](https://github.com/wanderwildwood/hitome)) can show the next dose, and
   any dose not marked, on the lock screen. It is off until **Settings → Next dose on the lock
   screen** is turned on, because it names medicines to anyone who picks up the phone.
-- **Calendar** ([koyomi](https://github.com/wanderwildwood/koyomi)), or any calendar app,
+- **Datebook** ([koyomi](https://github.com/wanderwildwood/koyomi)), or any calendar app,
   opens with the refill filled in.
-- **Contacts** ([enishi](https://github.com/wanderwildwood/enishi)), or the phone's own, is
+- **Connections** ([enishi](https://github.com/wanderwildwood/enishi)), or the phone's own, is
   where the pharmacy and the doctor are chosen from, and **Open in Contacts** goes back to them.
-- **Notes**, **Email** and **Messaging** take the log through **Share as text**; **Files**
+- **Memo**, **Mailbox** and **Messaging** take the log through **Share as text**; **Cabinet**
   ([tana](https://github.com/wanderwildwood/tana)) is one place to save the CSV.
 
 ## For other apps
@@ -91,7 +91,7 @@ not the log, what is left, the pharmacy, or the doctor's number.
 - An app targeting Android 11 or later also needs
   `<queries><package android:name="com.wanderwildwood.fukuyaku" /></queries>`.
 
-Another app can also offer a pharmacy. Contacts does it from a person's More page ("Set as
+Another app can also offer a pharmacy. Connections does it from a person's More page ("Set as
 pharmacy in Medicine"). Medicine shows the name and number with every medicine ticked; you
 untick any that use a different pharmacy and press **Set pharmacy**. Each ticked medicine then
 has it, as if chosen from Contacts on its own page.
