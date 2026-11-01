@@ -59,7 +59,6 @@ fun MedicineApp(opening: Long?, onOpened: () -> Unit) {
                 onTab = { tab = it },
                 onEdit = { editing = it },
                 onSettings = { settings = true },
-                onAbout = { about = true },
             )
         }
     }
@@ -103,7 +102,6 @@ private fun MainScreen(
     onTab: (Int) -> Unit,
     onEdit: (Long) -> Unit,
     onSettings: () -> Unit,
-    onAbout: () -> Unit,
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -112,7 +110,6 @@ private fun MainScreen(
                 title = { TextMMD(text = stringResource(R.string.app_name)) },
                 actions = {
                     BarButton(Icons.Settings, stringResource(R.string.cd_settings), onSettings)
-                    BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout)
                 },
             )
         },
