@@ -1,143 +1,181 @@
 package com.wanderwildwood.fukuyaku.ui
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.widget.Toast
-import androidx.annotation.RawRes
-import androidx.compose.foundation.background
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.text.TextMMD
-import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
-import com.wanderwildwood.fukuyaku.R
-
-const val SOURCE_URL = "https://github.com/wanderwildwood/fukuyaku"
-
-/** One thing the app is built with: its name, its licence and where it lives. */
-data class Component(val name: String, val licence: String, val link: String)
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
- * Everything the APK contains that is not this project's own code, from its dependency tree
- * (androidx and Compose libraries all carry their licence in META-INF of the APK). Libraries come
- * in families: one line per family.
+ * The Licences screen, the way Mudita's own apps do it: a plain list whose first row is the app
+ * itself and then one row per library (name, author), alphabetical. A row opens that project's
+ * page: its author, licence, a link to its website and the full licence text, paged by whole
+ * paragraphs. The app's page carries the GPL text and the Source code link. [modifier] gives the
+ * size (a dialog passes a fixed height, a screen fillMaxSize). [showBackButton] adds a Back button
+ * under the list; a page always has one, and the system Back returns from it to the list at the
+ * place it was left.
  */
-val components: List<Component> = listOf(
-    Component("Kotlin standard library 2.2", "Apache-2.0", "https://kotlinlang.org"),
-    Component("kotlinx.coroutines", "Apache-2.0", "https://github.com/Kotlin/kotlinx.coroutines"),
-    Component("AndroidX Core, Activity, Lifecycle, SavedState, Startup, Tracing, Emoji2, ProfileInstaller", "Apache-2.0", "https://developer.android.com/jetpack/androidx"),
-    Component("Jetpack Compose (runtime, UI, foundation, animation, Material 3, Material icons core)", "Apache-2.0", "https://developer.android.com/jetpack/compose"),
-    Component("MMD 1.0.2, Mudita's E Ink component library", "Apache-2.0", "https://github.com/mudita/MMD"),
-    Component("Lato typeface, inside MMD", "OFL-1.1", "https://www.latofonts.com"),
-    Component("Icons drawn from Google's Material Symbols", "Apache-2.0", "https://fonts.google.com/icons"),
-)
-
-/** The full texts shown once each, after the components: the licence name and the raw file. */
-data class LicenceText(val name: String, @RawRes val raw: Int)
-
-val licenceTexts: List<LicenceText> = listOf(
-    LicenceText("Apache-2.0", R.raw.apache_2_0),
-    LicenceText("OFL-1.1 (Lato)", R.raw.ofl_1_1),
-)
-
-/** Hard-wrapped licence text as paragraphs: blank lines break, single line breaks are spaces. */
-fun licenceParagraphs(text: String): List<String> =
-    text.replace("\r", "").split(Regex("\n\\s*\n"))
-        .map { p -> p.lines().joinToString(" ") { it.trim() }.trim() }
-        .filter { it.isNotEmpty() }
-
-private fun rawText(context: Context, @RawRes id: Int): List<String> =
-    licenceParagraphs(context.resources.openRawResource(id).bufferedReader().use { it.readText() })
-
-/** Opens an address; with no browser installed it says so in words instead of failing. */
-fun openLink(context: Context, address: String) =
-    openLink(context, address, context.getString(R.string.about_no_browser_address, address.removePrefix("https://")))
-
-/**
- * Where the source is, which licence the app is under with its full text, and what it is built
- * with. A page of plain text that turns on whole rows, with no rules between its parts.
- */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LicencesScreen(onClose: () -> Unit) {
+fun LicencesScreen(
+    data: LicencesData,
+    labels: LicencesLabels,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    showBackButton: Boolean = true,
+    showTitle: Boolean = true,
+) {
+    var open by rememberSaveable { mutableStateOf<String?>(null) }
+    val listState = rememberLazyListState()
+    val page = open?.let { licencePage(data, it) }
+    BackHandler(enabled = page != null) { open = null }
+    if (page != null) {
+        LicencePageScreen(page, labels, isApp = open == APP_ROW_KEY, onBack = { open = null }, modifier = modifier)
+        return
+    }
+    LicencesFrame(modifier, title = if (showTitle) labels.title else null, back = if (showBackButton) labels.back else null, onBack = onBack) { pageModifier ->
+        PagedColumn(modifier = pageModifier, state = listState) {
+            licenceRows(data).forEach { r -> item(key = r.key) { LicenceRowView(r) { open = r.key } } }
+        }
+    }
+}
+
+/**
+ * Title, the paged area and the Back button in a given space. The paged area gets an exact height
+ * (what is left after the title and button), because a PagedColumn measures its rows against a
+ * height it is handed, not one it takes from a weight.
+ */
+@Composable
+private fun LicencesFrame(modifier: Modifier, title: String?, back: String?, onBack: () -> Unit, titleLines: Int = 1, page: @Composable (Modifier) -> Unit) {
+    BoxWithConstraints(modifier) {
+        val titleRoom = if (title != null) TITLE_LINE * titleLines + 10.dp else 0.dp
+        val backRoom = if (back != null) BACK_ROOM else 0.dp
+        val pageHeight = (maxHeight - titleRoom - backRoom).coerceAtLeast(96.dp)
+        Column {
+            if (title != null) {
+                TextMMD(text = title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium, modifier = Modifier.height(TITLE_LINE * titleLines))
+                Spacer(Modifier.height(10.dp))
+            }
+            page(Modifier.fillMaxWidth().height(pageHeight))
+            if (back != null) LicencesBackButton(back, onBack)
+        }
+    }
+}
+
+/** One list row: the name, and under it the author (or, for the app, its licence); 48 dp at least. */
+@Composable
+private fun LicenceRowView(row: LicenceRow, onClick: () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clickable(onClick = onClick)
+            .padding(vertical = 6.dp),
+        verticalArrangement = Arrangement.Center,
+    ) {
+        TextMMD(text = row.title, style = MaterialTheme.typography.bodyMedium)
+        if (row.subtitle.isNotEmpty()) TextMMD(text = row.subtitle, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+@Composable
+private fun LicencePageScreen(page: LicencePage, labels: LicencesLabels, isApp: Boolean, onBack: () -> Unit, modifier: Modifier) {
     val context = LocalContext.current
-    val gpl = remember { rawText(context, R.raw.gpl_3_0) }
-    Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
-        TopAppBarMMD(title = { TextMMD(stringResource(R.string.licences_title)) })
-        Box(Modifier.weight(1f)) {
-            PagedColumn(Modifier, contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 12.dp)) {
-                item { Head(stringResource(R.string.licences_source)) }
-                item {
-                    TextMMD(
-                        SOURCE_URL,
-                        style = MaterialTheme.typography.bodySmall,
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 48.dp)
-                            .clickable { openLink(context, SOURCE_URL) }
-                            .padding(vertical = 12.dp),
-                    )
-                }
-                item { Head(stringResource(R.string.licences_licence)) }
-                item { Para(stringResource(R.string.licences_licence_body)) }
-                items(gpl) { Para(it) }
-                item { Head(stringResource(R.string.licences_built_with)) }
-                items(components) { c ->
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 48.dp)
-                            .clickable { openLink(context, c.link) }
-                            .padding(vertical = 6.dp),
-                    ) {
-                        TextMMD(c.name, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
-                        TextMMD(c.licence, style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-                for (t in licenceTexts) {
-                    item { Head(t.name) }
-                    items(rawText(context, t.raw)) { Para(it) }
-                }
-                item {
-                    OutlinedButtonMMD(
-                        onClick = onClose,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(top = 16.dp, bottom = 24.dp),
-                    ) { TextMMD(stringResource(R.string.about_close)) }
-                }
+    val go = { url: String -> openLink(context, url, labels.noBrowser(url.removePrefix("https://"))) }
+    val loaded by produceState(emptyList<List<String>>(), page.title) {
+        value = withContext(Dispatchers.IO) {
+            page.texts.map { t ->
+                runCatching {
+                    licenceParagraphs(context.resources.openRawResource(t.rawResId).bufferedReader().use { it.readText() })
+                }.getOrDefault(emptyList())
+            }
+        }
+    }
+    LicencesFrame(modifier, title = null, back = labels.back, onBack = onBack) { pageModifier ->
+        PagedColumn(modifier = pageModifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // The name may be long (a library can be several names), so it scrolls with the page rather than sitting in a fixed title.
+            item(key = "title") {
+                TextMMD(text = page.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+            }
+            page.author?.let { a -> item(key = "author") { LicencesBody(a) } }
+            item(key = "licence") { LicencesBody(page.licence) }
+            page.url?.let { u ->
+                item(key = "link") { LicencesLinkRow(if (isApp) labels.sourceHeading else u.removePrefix("https://")) { go(u) } }
+            }
+            page.note?.let { n -> item(key = "note") { LicencesBody(n) } }
+            if (page.texts.isEmpty()) {
+                item(key = "none") { LicencesBody(labels.noText(page.licence)) }
+            }
+            page.texts.forEachIndexed { ti, t ->
+                if (page.texts.size > 1) item(key = "h-$ti") { LicencesHeading(t.title) }
+                loaded.getOrNull(ti).orEmpty().forEachIndexed { i, p -> item(key = "p-$ti-$i") { LicencesBody(p) } }
             }
         }
     }
 }
 
 @Composable
-private fun Head(text: String) {
+private fun LicencesBackButton(label: String, onClick: () -> Unit) {
+    Spacer(Modifier.height(12.dp))
+    OutlinedButtonMMD(onClick = onClick, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+        TextMMD(text = label, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+@Composable
+private fun LicencesHeading(text: String) {
     TextMMD(
-        text,
-        style = MaterialTheme.typography.bodyMedium,
+        text = text,
+        style = MaterialTheme.typography.bodyLarge,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(top = 14.dp, bottom = 4.dp),
+        modifier = Modifier.padding(top = 10.dp, bottom = 2.dp),
     )
 }
 
 @Composable
-private fun Para(text: String) {
-    TextMMD(text, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(vertical = 5.dp))
+private fun LicencesBody(text: String) {
+    TextMMD(text = text, style = MaterialTheme.typography.bodyMedium)
 }
+
+/** A 48 dp row; underlined when it opens an address in a browser. */
+@Composable
+private fun LicencesLinkRow(text: String, underline: Boolean = true, onClick: () -> Unit) {
+    TextMMD(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        textDecoration = if (underline) TextDecoration.Underline else null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clickable(onClick = onClick)
+            .wrapContentHeight(Alignment.CenterVertically),
+    )
+}
+
+/** What a title line and the Back button with its gap take, which the paged area gives up. */
+private val TITLE_LINE: Dp = 28.dp
+private val BACK_ROOM: Dp = 60.dp

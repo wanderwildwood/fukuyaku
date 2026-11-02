@@ -36,7 +36,6 @@ fun MedicineApp(opening: Long?, onOpened: () -> Unit) {
     var editing by rememberSaveable { mutableStateOf<Long?>(null) }
     var settings by rememberSaveable { mutableStateOf(false) }
     var about by rememberSaveable { mutableStateOf(false) }
-    var licences by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(opening) {
         if (opening != null) {
@@ -47,9 +46,7 @@ fun MedicineApp(opening: Long?, onOpened: () -> Unit) {
     }
 
     val edit = editing
-    BackHandler(enabled = licences) { licences = false }
     when {
-        licences -> LicencesScreen(onClose = { licences = false })
         edit != null -> EditScreen(id = edit, onDone = { editing = null })
         settings -> SettingsScreen(onBack = { settings = false }, onAbout = { about = true })
         else -> {
@@ -62,7 +59,7 @@ fun MedicineApp(opening: Long?, onOpened: () -> Unit) {
             )
         }
     }
-    if (about) AboutDialog(onDismiss = { about = false }, onLicences = { about = false; licences = true })
+    if (about) AboutDialog(onDismiss = { about = false })
 
     // Said once, on the first start: what this is not. About carries the same words for good.
     val context = androidx.compose.ui.platform.LocalContext.current

@@ -323,16 +323,19 @@
     <string name="about_licence">GNU General Public License v3</string>
     <string name="about_licences">Licences</string>
     <string name="licences_title">Licences</string>
-    <string name="licences_source">Source code</string>
-    <string name="licences_licence">Licence</string>
-    <string name="licences_licence_body">This app is free software under the GNU General Public License, version 3 only. Copyright wander wildwood. The full text follows.</string>
-    <string name="licences_built_with">Built with</string>
+    <string name="licences_source_head">Source code</string>
+    <string name="licences_no_text">%s needs no licence text here.</string>
+    <string name="licences_back">Back</string>
+    <string name="licences_licence">Medicine is free software: GPL-3.0-only, copyright wander wildwood. What it is built on keeps its own licences, each on its own page.</string>
     <string name="first_run_title">Before you start</string>
     <string name="about_privacy_short">Everything you put in this app stays on this phone, and the app has no internet access. Privacy, Terms and Licences are in About.</string>
     <string name="first_run_ok">I understand</string>
-    <string name="about_icons">Icons from Material Symbols, Apache 2.0</string>
-    <string name="about_feed_the_llamas">feed the llamas</string>
+    <string name="about_feed_the_llamas">Feed the llamas</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
     <string name="about_no_browser">There is no browser on this phone to open that with.</string>
     <string name="about_close">Close</string>
+    <string name="licences_full_head">Full texts</string>
+    <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
+    <string name="licences_full_apache">Apache License 2.0 (full text)</string>
+    <string name="licences_full_ofl">SIL Open Font Licence 1.1 (full text)</string>
 </resources>
