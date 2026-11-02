@@ -113,4 +113,65 @@ class LicencesLogicTest {
     @Test fun paragraphsKeepEveryWord() {
         assertEquals(listOf("One two three", "Four five"), licenceParagraphs("One two\n three\n\n\nFour\r\nfive"))
     }
+
+    @Test fun listPlanMakesEveryPageFourWholeRows() {
+        val plan = licenceListPlan(availablePx = 1003, verticalPadPx = 12, titleLinePx = 40, subtitleLinePx = 34)
+        assertEquals(250, plan.rowPx)
+        assertEquals(1000, plan.listPx)
+        assertEquals(0, plan.listPx % plan.rowPx)
+        assertEquals(2, plan.titleLines)
+    }
+
+    @Test fun listPlanShortensTheNameWhenTheRowIsTight() {
+        // 4 rows of 80 px: 80 - 24 - 34 = 22 px left, less than one title line; still one line, never zero.
+        assertEquals(1, licenceListPlan(320, 12, 40, 34).titleLines)
+        // a very tall row never takes more than two lines
+        assertEquals(2, licenceListPlan(4000, 12, 40, 34).titleLines)
+    }
+
+    @Test fun listPlanSurvivesNoRoom() {
+        val plan = licenceListPlan(0, 12, 40, 34)
+        assertEquals(1, plan.rowPx)
+        assertEquals(4, plan.listPx)
+    }
+
+    @Test fun lastPageEndsOnTheFinalRowAndNoPageIsShort() {
+        assertEquals(listOf(0, 4, 5), licencePageStarts(9))
+        assertEquals(listOf(0, 4), licencePageStarts(8))
+        assertEquals(listOf(0), licencePageStarts(3))
+        assertEquals(emptyList<Int>(), licencePageStarts(0))
+        for (n in 1..40) for (start in licencePageStarts(n)) assertTrue(start + 4 <= n || start == 0)
+    }
+
+    @Test
+    fun heightPagesFitTheViewportAndSkipNothing() {
+        val h = listOf(30, 120, 40, 200, 90, 90, 90, 10, 60)
+        val starts = licencePageStartsByHeight(h, gapPx = 8, viewportPx = 300)
+        assertEquals(0, starts.first())
+        val ends = starts.drop(1) + h.size
+        var covered = 0
+        starts.zip(ends).forEach { (s, e) ->
+            assertEquals("no row skipped", covered, s)
+            val used = (s until e).sumOf { h[it] } + 8 * (e - s - 1)
+            assertTrue("page $s..$e is $used px", used <= 300)
+            covered = e
+        }
+        assertEquals(h.size, covered)
+        assertEquals(listOf(0, 3, 5), starts)
+    }
+
+    @Test
+    fun heightPagesExactValues() {
+        // 100+8+100 = 208 fits 210; the third 100 does not.
+        assertEquals(listOf(0, 2, 4), licencePageStartsByHeight(listOf(100, 100, 100, 100, 50), 8, 210))
+    }
+
+    @Test
+    fun aRowTallerThanThePageHasItsOwnAndHeadingsStayWithTheirText() {
+        assertEquals(listOf(0, 1, 2), licencePageStartsByHeight(listOf(50, 900, 50), 8, 300))
+        // heading (row 1) would end the first page: it moves on with its paragraph
+        assertEquals(listOf(0, 1), licencePageStartsByHeight(listOf(250, 40, 200), 8, 300, listOf(false, true, false)))
+        assertEquals(listOf(0, 1), licencePageStartsByHeight(listOf(100, 40, 200), 8, 300, listOf(false, true, false)))
+        assertEquals(emptyList<Int>(), licencePageStartsByHeight(emptyList(), 8, 300))
+    }
 }
