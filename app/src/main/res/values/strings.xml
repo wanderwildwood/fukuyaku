@@ -333,14 +333,14 @@
     <string name="about_disclaimer_head">Medical disclaimer</string>
     <string name="about_disclaimer">This app is a record-keeping aid, not medical advice. It does not diagnose, treat or replace a doctor or pharmacist. Check doses and dates with them.</string>
     <string name="about_licence">GNU General Public License v3</string>
-    <string name="about_licences">Licences</string>
-    <string name="licences_title">Licences</string>
+    <string name="about_licences">Licenses</string>
+    <string name="licences_title">Licenses</string>
     <string name="licences_source_head">Source code</string>
-    <string name="licences_no_text">%s needs no licence text here.</string>
+    <string name="licences_no_text">%s needs no license text here.</string>
     <string name="licences_back">Back</string>
-    <string name="licences_licence">Medicine is free software: GPL-3.0-only, copyright wander wildwood. What it is built on keeps its own licences, each on its own page.</string>
+    <string name="licences_licence">Medicine is free software: GPL-3.0-only, copyright wander wildwood. What it is built on keeps its own licenses, each on its own page.</string>
     <string name="first_run_title">Before you start</string>
-    <string name="about_privacy_short">Everything you put in this app stays on this phone, and the app has no internet access. Privacy, Terms and Licences are in About.</string>
+    <string name="about_privacy_short">Everything you put in this app stays on this phone, and the app has no internet access. Privacy, Terms and Licenses are in About.</string>
     <string name="first_run_ok">I understand</string>
     <string name="about_feed_the_llamas">Feed the llamas</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
@@ -349,5 +349,5 @@
     <string name="licences_full_head">Full texts</string>
     <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
     <string name="licences_full_apache">Apache License 2.0 (full text)</string>
-    <string name="licences_full_ofl">SIL Open Font Licence 1.1 (full text)</string>
+    <string name="licences_full_ofl">SIL Open Font License 1.1 (full text)</string>
 </resources>
