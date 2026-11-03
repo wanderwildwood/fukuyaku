@@ -44,7 +44,7 @@ ships with.
 ## One step on a Kompakt
 
 The Kompakt's DuraSpeed setting shuts down apps a few minutes after the screen goes dark, and
-an app shut down that way has its alarms cancelled: no reminder rings until the app is opened
+an app shut down that way has its alarms canceled: no reminder rings until the app is opened
 again. On a Kompakt, Medicine's first screen says so and has a button to **Open DuraSpeed**;
 tap **Open** there and switch Medicine on in the list, then press **It's switched on**. If
 DuraSpeed stops the app again later, the step comes back.
@@ -127,7 +127,7 @@ For updates without doing this by hand, add this repository to
 
     https://github.com/wanderwildwood/fukuyaku
 
-## Licence
+## License
 
 GPL-3.0-only. See [LICENSE](LICENSE).
 
@@ -143,6 +143,6 @@ the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program. If
 not, see <https://www.gnu.org/licenses/>.
 
-A medicine reminder holds some of the most private things about a person, and the licence is
+A medicine reminder holds some of the most private things about a person, and the license is
 copyleft so that nobody can ship this code with something added that sends them anywhere,
 without publishing what they added. Icons are from Material Symbols, Apache 2.0.
