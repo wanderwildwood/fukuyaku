@@ -131,7 +131,7 @@ fun LogScreen() {
                     modifier = Modifier.weight(1f).height(48.dp),
                 ) { TextMMD(text = stringResource(R.string.log_save_csv), style = MaterialTheme.typography.bodySmall) }
             }
-            HorizontalDividerMMD()
+            DottedRule(start = 0.dp, end = 0.dp)
         }
         for ((day, those) in byDay) {
             item(key = "day:$day") { Heading(Times.relativeDay(context, day)) }

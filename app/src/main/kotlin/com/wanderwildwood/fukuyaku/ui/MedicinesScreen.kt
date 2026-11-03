@@ -40,7 +40,7 @@ fun MedicinesScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
         for (m in medicines) {
             item(key = m.id) {
                 MedicineRow(m) { onEdit(m.id) }
-                HorizontalDividerMMD()
+                DottedRule(start = 0.dp, end = 0.dp)
             }
         }
     }

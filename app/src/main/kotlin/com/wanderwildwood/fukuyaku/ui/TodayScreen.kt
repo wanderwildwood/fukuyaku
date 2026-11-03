@@ -210,6 +210,7 @@ fun TodayScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
 /** One dose: its time in a column of its own, then what it is and what became of it. */
 @Composable
 fun DoseRow(time: String, label: String, status: String, bold: Boolean, onClick: () -> Unit) {
+    Column {
     Row(
         Modifier
             .fillMaxWidth()
@@ -232,6 +233,8 @@ fun DoseRow(time: String, label: String, status: String, bold: Boolean, onClick:
             )
             TextMMD(text = status, style = MaterialTheme.typography.labelSmall)
         }
+    }
+    DottedRule(start = 0.dp, end = 0.dp)
     }
 }
 
