@@ -301,6 +301,18 @@
     <string name="settings_test_note">It rings in a minute, the way a dose does</string>
     <!-- %1$s is a time -->
     <string name="settings_test_set">Rings at %1$s</string>
+    <string name="settings_backup_heading">Backup</string>
+    <string name="settings_save_backup">Save a backup</string>
+    <string name="settings_save_backup_note">Saves your medicines and their schedules, doctors, pharmacies and notes, the whole log, and the choices on this page to one file you pick. Not saved: the reminder sound, and the notices you have already dismissed.</string>
+    <string name="settings_restore">Restore from a backup</string>
+    <string name="settings_restore_armed">Restore — your medicines and log are replaced by the file\'s; tap again to choose it</string>
+    <string name="backup_saved">Backup saved.</string>
+    <string name="backup_not_saved">The backup could not be written.</string>
+    <string name="restore_done">Restored. %1$d medicines and %2$d doses.</string>
+    <string name="restore_not_ours">That file is not a backup from this app. Nothing was changed.</string>
+    <string name="restore_newer">That backup was made by a newer version of this app. Update the app and try again. Nothing was changed.</string>
+    <string name="restore_damaged">That backup is damaged, so it was not used. Nothing was changed.</string>
+    <string name="restore_unreadable">That file could not be read. Nothing was changed.</string>
     <string name="settings_clear_log">Clear the log</string>
     <string name="settings_clear_log_armed">Clear — every dose in the log goes; tap again</string>
     <plurals name="minutes">

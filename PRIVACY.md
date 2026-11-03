@@ -31,6 +31,8 @@ them up, and one row per dose with when it was due, whether it was taken or skip
 was marked, and when its reminder rang. A few settings sit in `SharedPreferences`, all of them
 in `data/Settings.kt`.
 
+**Save a backup** (Settings) writes the medicines, the log and the choices on the Settings page to one JSON file you choose through the phone's own file picker, and only when you ask. **Restore from a backup** reads such a file the same way, checks all of it first, and only then replaces the medicines and log; a wrong file changes nothing.
+
 Uninstalling the app deletes all of it. **Settings → Clear the log** deletes the log and keeps
 the medicines.
 

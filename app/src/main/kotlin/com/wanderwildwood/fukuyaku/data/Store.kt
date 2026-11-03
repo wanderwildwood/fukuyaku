@@ -83,24 +83,7 @@ class Store private constructor(context: Context) :
 
     /** Adds [m] when its id is 0, otherwise replaces it; returns its id. */
     fun save(m: Medicine): Long {
-        val values = ContentValues().apply {
-            put("name", m.name)
-            put("amount", m.amount)
-            put("schedule", Schedule.encode(m.schedule))
-            if (m.left == null) putNull("left_count") else put("left_count", m.left)
-            put("per_dose", m.perDose)
-            if (m.warnAt == null) putNull("warn_at") else put("warn_at", m.warnAt)
-            put("pharmacy_name", m.pharmacyName)
-            put("pharmacy_number", m.pharmacyNumber)
-            put("pharmacy_contact", m.pharmacyContact)
-            put("doctor_name", m.doctorName)
-            put("doctor_number", m.doctorNumber)
-            put("doctor_contact", m.doctorContact)
-            put("notes", m.notes)
-            put("paused", if (m.paused) 1 else 0)
-            put("caught_up", m.caughtUp)
-            put("refill_warned", if (m.refillWarned) 1 else 0)
-        }
+        val values = medicineValues(m)
         val id = if (m.id == 0L) {
             writableDatabase.insertOrThrow("medicine", null, values)
         } else {
@@ -109,6 +92,25 @@ class Store private constructor(context: Context) :
         }
         changed()
         return id
+    }
+
+    private fun medicineValues(m: Medicine) = ContentValues().apply {
+        put("name", m.name)
+        put("amount", m.amount)
+        put("schedule", Schedule.encode(m.schedule))
+        if (m.left == null) putNull("left_count") else put("left_count", m.left)
+        put("per_dose", m.perDose)
+        if (m.warnAt == null) putNull("warn_at") else put("warn_at", m.warnAt)
+        put("pharmacy_name", m.pharmacyName)
+        put("pharmacy_number", m.pharmacyNumber)
+        put("pharmacy_contact", m.pharmacyContact)
+        put("doctor_name", m.doctorName)
+        put("doctor_number", m.doctorNumber)
+        put("doctor_contact", m.doctorContact)
+        put("notes", m.notes)
+        put("paused", if (m.paused) 1 else 0)
+        put("caught_up", m.caughtUp)
+        put("refill_warned", if (m.refillWarned) 1 else 0)
     }
 
     fun deleteMedicine(id: Long) {
@@ -137,6 +139,31 @@ class Store private constructor(context: Context) :
             caughtUp = c.long("caught_up"),
             refillWarned = c.int("refill_warned") != 0,
         )
+    }
+
+    // ---------------------------------------------------------------- restore
+
+    /**
+     * Replaces the medicines and the log with [b], in one transaction: if anything fails the
+     * database is as it was. Ids are kept, so each dose still points at its medicine.
+     */
+    fun replaceAll(b: Backup.Contents) {
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete("dose", null, null)
+            db.delete("medicine", null, null)
+            for (m in b.medicines) {
+                val v = medicineValues(m)
+                v.put("id", m.id)
+                db.insertOrThrow("medicine", null, v)
+            }
+            for (d in b.doses) db.insertOrThrow("dose", null, doseValues(d))
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+        changed()
     }
 
     // ---------------------------------------------------------------- the log

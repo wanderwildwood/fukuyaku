@@ -1,6 +1,11 @@
 package com.wanderwildwood.fukuyaku.ui
 
 import android.content.Intent
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import com.wanderwildwood.fukuyaku.data.Backup
+import com.wanderwildwood.fukuyaku.data.BackupFiles
 import android.provider.Settings as AndroidSettings
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Spacer
@@ -48,6 +53,28 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     var pickSnooze by remember { mutableStateOf(false) }
     var pickAgain by remember { mutableStateOf(false) }
     BackHandler { onBack() }
+
+    val saveBackup = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val ok = BackupFiles.save(context, uri)
+        Toast.makeText(context, context.getString(if (ok) R.string.backup_saved else R.string.backup_not_saved), if (ok) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
+    }
+    val restoreBackup = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val message = when (val r = BackupFiles.restore(context, uri)) {
+            is BackupFiles.Result.Done -> context.getString(R.string.restore_done, r.medicines, r.doses)
+            is BackupFiles.Result.Refused -> context.getString(
+                when (r.kind) {
+                    Backup.BackupException.Kind.NOT_A_BACKUP -> R.string.restore_not_ours
+                    Backup.BackupException.Kind.NEWER -> R.string.restore_newer
+                    Backup.BackupException.Kind.DAMAGED -> R.string.restore_damaged
+                },
+            )
+            BackupFiles.Result.Unreadable -> context.getString(R.string.restore_unreadable)
+        }
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        v++
+    }
 
     // Read again after every change; [v] is only here to make that happen.
     val snooze = remember(v) { s.snoozeMinutes }
@@ -128,6 +155,17 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                 ) {
                     Reminders.test(context)
                     v++
+                }
+            }
+            item(key = "backup_heading") { Heading(stringResource(R.string.settings_backup_heading)) }
+            item(key = "backup") {
+                SettingRow(stringResource(R.string.settings_save_backup), stringResource(R.string.settings_save_backup_note)) {
+                    runCatching { saveBackup.launch("medicine-backup-${java.time.LocalDate.now()}.json") }
+                }
+            }
+            item(key = "restore") {
+                ArmedRow(stringResource(R.string.settings_restore), stringResource(R.string.settings_restore_armed)) {
+                    runCatching { restoreBackup.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }
                 }
             }
             item(key = "clear") {

@@ -55,4 +55,16 @@ class Settings(context: Context) {
     var stoppedAt: Long
         get() = prefs.getLong("stopped_at", 0L)
         set(v) = prefs.edit().putLong("stopped_at", v).apply()
+
+    /** The choices that go into a backup. */
+    fun choices() = Backup.Choices(snoozeMinutes, againMinutes, fullScreen, asAlarmClock, onLockScreen)
+
+    /** Puts back the choices from a backup. */
+    fun apply(c: Backup.Choices) {
+        snoozeMinutes = c.snoozeMinutes
+        againMinutes = c.againMinutes
+        fullScreen = c.fullScreen
+        asAlarmClock = c.asAlarmClock
+        onLockScreen = c.onLockScreen
+    }
 }
