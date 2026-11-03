@@ -252,8 +252,8 @@
     <string name="action_taken">Taken</string>
     <string name="action_skip">Skip</string>
     <!-- %1$s is a number of minutes -->
-    <string name="action_snooze">Snooze %1$s min</string>
-    <string name="action_snooze_all">Snooze all, %1$s min</string>
+    <string name="action_snooze">Snooze %1$d min</string>
+    <string name="action_snooze_all">Snooze all, %1$d min</string>
     <string name="ringing_title">Medicine</string>
     <string name="ringing_none">Nothing is ringing now.</string>
     <string name="ringing_later">Answer later</string>
