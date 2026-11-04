@@ -7,16 +7,6 @@ import com.wanderwildwood.fukuyaku.R
 /** The address of the app's own source code. */
 const val SOURCE_URL = "https://github.com/wanderwildwood/fukuyaku"
 
-/** What the APK carries that is not this app's own code, and the licence each project declares. */
-val LICENCE_COMPONENTS: List<LicenceComponent> = listOf(
-    LicenceComponent("Kotlin and kotlinx.coroutines", "JetBrains", "Apache-2.0", "https://kotlinlang.org"),
-    LicenceComponent("AndroidX Core, Activity, Lifecycle, SavedState, Startup, Tracing, Emoji2, ProfileInstaller", "Google", "Apache-2.0", "https://developer.android.com/jetpack/androidx"),
-    LicenceComponent("Jetpack Compose", "Google", "Apache-2.0", "https://developer.android.com/jetpack/compose"),
-    LicenceComponent("Mudita Mindful Design (MMD)", "Mudita", "Apache-2.0", "https://github.com/mudita/MMD"),
-    LicenceComponent("Lato typeface, supplied with MMD", "Łukasz Dziedzic", "OFL-1.1", "https://www.latofonts.com"),
-    LicenceComponent("Material Symbols icons", "Google", "Apache-2.0", "https://fonts.google.com/icons"),
-)
-
 /** Each distinct licence text once: family id and the raw resource. */
 val LICENCE_RAW: List<Pair<String, Int>> = listOf(
     "gpl" to R.raw.gpl_3_0,
@@ -29,7 +19,8 @@ fun rememberLicencesData(): LicencesData = LicencesData(
     appName = "Medicine",
     sourceUrl = SOURCE_URL,
     licenceLine = stringResource(R.string.licences_licence),
-    components = LICENCE_COMPONENTS,
+    // One row per artifact in the APK, listed by the build (config/libraries adds what Gradle cannot see).
+    components = rememberGeneratedComponents(R.raw.aboutlibraries),
     texts = LICENCE_RAW.map { (id, raw) ->
         LicenceText(id, stringResource(when (id) {
             "gpl" -> R.string.licences_full_gpl
