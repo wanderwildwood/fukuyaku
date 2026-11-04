@@ -11,6 +11,7 @@ import com.mudita.mmd.ThemeMMD
 import com.wanderwildwood.fukuyaku.alarm.Notifier
 import com.wanderwildwood.fukuyaku.alarm.Reminders
 import com.wanderwildwood.fukuyaku.ui.MedicineApp
+import com.wanderwildwood.fukuyaku.ui.houseTypography
 import com.wanderwildwood.fukuyaku.ui.monochrome
 import com.wanderwildwood.fukuyaku.ui.ArmedScope
 
@@ -24,7 +25,7 @@ class MainActivity : ComponentActivity() {
         Notifier.channels(this)
         if (savedInstanceState == null) opening.value = medicineIn(intent)
         setContent {
-            ThemeMMD(colorScheme = monochrome) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
                 ArmedScope {
                     // A blinking cursor redraws the screen twice a second for nothing, on e-ink.
                     CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {

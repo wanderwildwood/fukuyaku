@@ -36,6 +36,7 @@ import com.wanderwildwood.fukuyaku.data.Plan
 import com.wanderwildwood.fukuyaku.data.Settings
 import com.wanderwildwood.fukuyaku.data.Status
 import com.wanderwildwood.fukuyaku.data.Store
+import com.wanderwildwood.fukuyaku.ui.houseTypography
 import com.wanderwildwood.fukuyaku.ui.monochrome
 import com.wanderwildwood.fukuyaku.ui.ArmedScope
 
@@ -51,7 +52,7 @@ class ReminderActivity : ComponentActivity() {
         setShowWhenLocked(true)
         setTurnScreenOn(true)
         setContent {
-            ThemeMMD(colorScheme = monochrome) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
                 ArmedScope {
                     Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
                         Ringing(onDone = ::finish)

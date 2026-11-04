@@ -32,6 +32,7 @@ import com.wanderwildwood.fukuyaku.alarm.Reminders
 import com.wanderwildwood.fukuyaku.data.Medicine
 import com.wanderwildwood.fukuyaku.data.Store
 import com.wanderwildwood.fukuyaku.ui.CheckRow
+import com.wanderwildwood.fukuyaku.ui.houseTypography
 import com.wanderwildwood.fukuyaku.ui.monochrome
 import com.wanderwildwood.fukuyaku.ui.ArmedScope
 
@@ -78,7 +79,7 @@ abstract class SetWhoActivity(
             runCatching { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() }.getOrNull() ?: pkg
         }
         setContent {
-            ThemeMMD(colorScheme = monochrome) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
                 ArmedScope {
                     BackHandler { finish() }
                     var ticked by rememberSaveable { mutableStateOf(medicines.map { it.id }) }

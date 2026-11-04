@@ -28,6 +28,7 @@ import com.wanderwildwood.fukuyaku.data.Days
 import com.wanderwildwood.fukuyaku.data.Schedule
 import com.wanderwildwood.fukuyaku.data.Store
 import com.wanderwildwood.fukuyaku.ui.Words
+import com.wanderwildwood.fukuyaku.ui.houseTypography
 import com.wanderwildwood.fukuyaku.ui.monochrome
 import com.wanderwildwood.fukuyaku.ui.ArmedScope
 
@@ -54,7 +55,7 @@ class ShareMedicinesActivity : ComponentActivity() {
         }
         val canShare = asker != null
         setContent {
-            ThemeMMD(colorScheme = monochrome) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
                 ArmedScope {
                     BackHandler { finish() }
                     Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
