@@ -29,6 +29,7 @@ import com.wanderwildwood.fukuyaku.data.Schedule
 import com.wanderwildwood.fukuyaku.data.Store
 import com.wanderwildwood.fukuyaku.ui.Words
 import com.wanderwildwood.fukuyaku.ui.monochrome
+import com.wanderwildwood.fukuyaku.ui.ArmedScope
 
 /**
  * The medicine list, for another app that asks: Field Kit's emergency card first. The person
@@ -54,44 +55,46 @@ class ShareMedicinesActivity : ComponentActivity() {
         val canShare = asker != null
         setContent {
             ThemeMMD(colorScheme = monochrome) {
-                BackHandler { finish() }
-                Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
-                    Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp)) {
-                        TextMMD(text = stringResource(R.string.share_title), style = MaterialTheme.typography.titleLarge)
-                        Spacer(Modifier.height(12.dp))
-                        TextMMD(
-                            text = when {
-                                lines.isEmpty() -> stringResource(R.string.share_none)
-                                asker != null -> stringResource(R.string.share_ask, asker)
-                                else -> stringResource(R.string.share_ask_unknown)
-                            },
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                            lines.forEachIndexed { i, line ->
-                                item(key = i) {
-                                    TextMMD(text = line, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
-                                }
-                            }
-                        }
-                        if (lines.isNotEmpty() && canShare) {
-                            ButtonMMD(
-                                onClick = {
-                                    setResult(Activity.RESULT_OK, Intent().putExtra(Intent.EXTRA_TEXT, lines.joinToString("\n")))
-                                    finish()
-                                },
-                                modifier = Modifier.fillMaxWidth().height(56.dp),
-                            ) { TextMMD(text = stringResource(R.string.share_yes), style = MaterialTheme.typography.bodyMedium) }
-                            Spacer(Modifier.height(8.dp))
-                        }
-                        OutlinedButtonMMD(
-                            onClick = { finish() },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                        ) {
+                ArmedScope {
+                    BackHandler { finish() }
+                    Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
+                        Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp)) {
+                            TextMMD(text = stringResource(R.string.share_title), style = MaterialTheme.typography.titleLarge)
+                            Spacer(Modifier.height(12.dp))
                             TextMMD(
-                                text = stringResource(if (lines.isEmpty() || !canShare) R.string.close else R.string.share_no),
+                                text = when {
+                                    lines.isEmpty() -> stringResource(R.string.share_none)
+                                    asker != null -> stringResource(R.string.share_ask, asker)
+                                    else -> stringResource(R.string.share_ask_unknown)
+                                },
                                 style = MaterialTheme.typography.bodyMedium,
                             )
+                            PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                lines.forEachIndexed { i, line ->
+                                    item(key = i) {
+                                        TextMMD(text = line, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))
+                                    }
+                                }
+                            }
+                            if (lines.isNotEmpty() && canShare) {
+                                ButtonMMD(
+                                    onClick = {
+                                        setResult(Activity.RESULT_OK, Intent().putExtra(Intent.EXTRA_TEXT, lines.joinToString("\n")))
+                                        finish()
+                                    },
+                                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                                ) { TextMMD(text = stringResource(R.string.share_yes), style = MaterialTheme.typography.bodyMedium) }
+                                Spacer(Modifier.height(8.dp))
+                            }
+                            OutlinedButtonMMD(
+                                onClick = { finish() },
+                                modifier = Modifier.fillMaxWidth().height(56.dp),
+                            ) {
+                                TextMMD(
+                                    text = stringResource(if (lines.isEmpty() || !canShare) R.string.close else R.string.share_no),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            }
                         }
                     }
                 }

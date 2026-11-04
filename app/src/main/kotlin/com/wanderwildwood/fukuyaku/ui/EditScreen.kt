@@ -56,7 +56,6 @@ import com.wanderwildwood.fukuyaku.alarm.Reminders
 import com.wanderwildwood.fukuyaku.data.Medicine
 import com.wanderwildwood.fukuyaku.data.Plan
 import com.wanderwildwood.fukuyaku.data.Store
-import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -80,7 +79,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
     var savedId by rememberSaveable(id) { mutableStateOf(0L) }
     fun base(): Medicine? = original ?: savedId.takeIf { it != 0L }?.let { store.medicine(it) }
     var problem by remember { mutableStateOf<Int?>(null) }
-    var leaving by remember { mutableStateOf(false) }
+    var leaving by rememberArmedFlag(disarmOnBack = false)
     var pickTime by remember { mutableStateOf<Int?>(null) }
     var pickHoursFrom by remember { mutableStateOf(false) }
     var pickFrom by remember { mutableStateOf(false) }
@@ -112,13 +111,6 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
             seen = now
         }
         onPauseOrDispose { }
-    }
-
-    LaunchedEffect(leaving) {
-        if (leaving) {
-            delay(6000)
-            leaving = false
-        }
     }
 
     fun save(): Boolean {

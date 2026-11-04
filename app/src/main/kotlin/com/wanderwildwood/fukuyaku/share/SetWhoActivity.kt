@@ -33,6 +33,7 @@ import com.wanderwildwood.fukuyaku.data.Medicine
 import com.wanderwildwood.fukuyaku.data.Store
 import com.wanderwildwood.fukuyaku.ui.CheckRow
 import com.wanderwildwood.fukuyaku.ui.monochrome
+import com.wanderwildwood.fukuyaku.ui.ArmedScope
 
 /**
  * A pharmacy or a doctor handed over by another app: Contacts' "Set as pharmacy in Medicine"
@@ -78,65 +79,67 @@ abstract class SetWhoActivity(
         }
         setContent {
             ThemeMMD(colorScheme = monochrome) {
-                BackHandler { finish() }
-                var ticked by rememberSaveable { mutableStateOf(medicines.map { it.id }) }
-                Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
-                    Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp)) {
-                        TextMMD(text = stringResource(title), style = MaterialTheme.typography.titleLarge)
-                        Spacer(Modifier.height(12.dp))
-                        TextMMD(
-                            text = listOf(given.name, given.number).filter { it.isNotEmpty() }.joinToString("  "),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        TextMMD(
-                            text = if (asker != null) stringResource(R.string.set_from, asker) else stringResource(R.string.set_from_unknown),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        TextMMD(
-                            text = stringResource(if (medicines.isEmpty()) none else ask),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
-                            medicines.forEach { m ->
-                                item(key = m.id) {
-                                    val now = current(m).takeIf { it.isNotBlank() && it != given.name.ifBlank { given.number } }
-                                    CheckRow(if (now == null) m.label else m.label + " (" + now + ")", m.id in ticked) { on ->
-                                        ticked = if (on) ticked + m.id else ticked - m.id
+                ArmedScope {
+                    BackHandler { finish() }
+                    var ticked by rememberSaveable { mutableStateOf(medicines.map { it.id }) }
+                    Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
+                        Column(Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 24.dp)) {
+                            TextMMD(text = stringResource(title), style = MaterialTheme.typography.titleLarge)
+                            Spacer(Modifier.height(12.dp))
+                            TextMMD(
+                                text = listOf(given.name, given.number).filter { it.isNotEmpty() }.joinToString("  "),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            TextMMD(
+                                text = if (asker != null) stringResource(R.string.set_from, asker) else stringResource(R.string.set_from_unknown),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            TextMMD(
+                                text = stringResource(if (medicines.isEmpty()) none else ask),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                                medicines.forEach { m ->
+                                    item(key = m.id) {
+                                        val now = current(m).takeIf { it.isNotBlank() && it != given.name.ifBlank { given.number } }
+                                        CheckRow(if (now == null) m.label else m.label + " (" + now + ")", m.id in ticked) { on ->
+                                            ticked = if (on) ticked + m.id else ticked - m.id
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if (medicines.isNotEmpty()) {
-                            ButtonMMD(
-                                onClick = {
-                                    val chosen = medicines.filter { it.id in ticked }
-                                    chosen.forEach { m ->
-                                        Reminders.save(this@SetWhoActivity, apply(m, given))
-                                    }
-                                    Toast.makeText(
-                                        this@SetWhoActivity,
-                                        resources.getQuantityString(done, chosen.size, chosen.size),
-                                        Toast.LENGTH_SHORT,
-                                    ).show()
-                                    setResult(Activity.RESULT_OK)
-                                    finish()
-                                },
-                                enabled = ticked.isNotEmpty(),
+                            if (medicines.isNotEmpty()) {
+                                ButtonMMD(
+                                    onClick = {
+                                        val chosen = medicines.filter { it.id in ticked }
+                                        chosen.forEach { m ->
+                                            Reminders.save(this@SetWhoActivity, apply(m, given))
+                                        }
+                                        Toast.makeText(
+                                            this@SetWhoActivity,
+                                            resources.getQuantityString(done, chosen.size, chosen.size),
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                        setResult(Activity.RESULT_OK)
+                                        finish()
+                                    },
+                                    enabled = ticked.isNotEmpty(),
+                                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                                ) { TextMMD(text = stringResource(yes), style = MaterialTheme.typography.bodyMedium) }
+                                Spacer(Modifier.height(8.dp))
+                            }
+                            OutlinedButtonMMD(
+                                onClick = { finish() },
                                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                            ) { TextMMD(text = stringResource(yes), style = MaterialTheme.typography.bodyMedium) }
-                            Spacer(Modifier.height(8.dp))
-                        }
-                        OutlinedButtonMMD(
-                            onClick = { finish() },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                        ) {
-                            TextMMD(
-                                text = stringResource(if (medicines.isEmpty()) R.string.close else R.string.cancel),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
+                            ) {
+                                TextMMD(
+                                    text = stringResource(if (medicines.isEmpty()) R.string.close else R.string.cancel),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            }
                         }
                     }
                 }

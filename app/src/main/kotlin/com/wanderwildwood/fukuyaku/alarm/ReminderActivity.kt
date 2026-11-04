@@ -37,6 +37,7 @@ import com.wanderwildwood.fukuyaku.data.Settings
 import com.wanderwildwood.fukuyaku.data.Status
 import com.wanderwildwood.fukuyaku.data.Store
 import com.wanderwildwood.fukuyaku.ui.monochrome
+import com.wanderwildwood.fukuyaku.ui.ArmedScope
 
 /**
  * The reminder as a whole screen, shown over the lock screen when a dose rings with the
@@ -51,8 +52,10 @@ class ReminderActivity : ComponentActivity() {
         setTurnScreenOn(true)
         setContent {
             ThemeMMD(colorScheme = monochrome) {
-                Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
-                    Ringing(onDone = ::finish)
+                ArmedScope {
+                    Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
+                        Ringing(onDone = ::finish)
+                    }
                 }
             }
         }
