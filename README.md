@@ -91,9 +91,9 @@ not the log, what is left, the pharmacy, or the doctor's number.
 - An app targeting Android 11 or later also needs
   `<queries><package android:name="com.wanderwildwood.fukuyaku" /></queries>`.
 
-Any app can also offer a pharmacy. Medicine shows the name and number with every medicine ticked; you
-untick any that use a different pharmacy and press **Set pharmacy**. Each ticked medicine then
-has it, as if chosen from Contacts on its own page.
+Any app can also offer a pharmacy. Medicine shows the name and number with every medicine
+ticked; you untick any that use a different pharmacy and press **Set pharmacy**. Each ticked
+medicine then has it, as if chosen from Contacts on its own page.
 
 - Start: action `com.wanderwildwood.fukuyaku.action.SET_PHARMACY`, with
   `setPackage("com.wanderwildwood.fukuyaku")` and string extras
@@ -102,7 +102,7 @@ has it, as if chosen from Contacts on its own page.
   lookup URI for "Open in Contacts".
 - On Set pharmacy: `RESULT_OK`. Otherwise `RESULT_CANCELED`.
 
-A doctor comes the same way ("Set as doctor in Medicine"): action
+A doctor comes the same way: action
 `com.wanderwildwood.fukuyaku.action.SET_DOCTOR`, the same three extras, and **Set doctor**.
 
 ## Building
