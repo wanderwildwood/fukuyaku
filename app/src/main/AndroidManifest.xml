@@ -23,6 +23,8 @@
         </intent>
         <!-- DuraSpeed, the Kompakt's background manager: only to say whether it is there. -->
         <package android:name="com.mediatek.duraspeed" />
+        <!-- Glance, the lock-screen panel: its switch in Settings shows only when it is there. -->
+        <package android:name="com.wanderwildwood.hitome" />
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
             <data android:mimeType="text/plain" />
@@ -108,7 +110,7 @@
             </intent-filter>
         </activity>
 
-        <!-- A pharmacy sent from Contacts ("Set as pharmacy in Medicine"), set only after the
+        <!-- A pharmacy sent by another app, open for any app to call; set only after the
              person ticks which medicines it is for and presses Set. See
              share/SetWhoActivity.kt and "For other apps" in the README. -->
         <activity
@@ -123,7 +125,7 @@
             </intent-filter>
         </activity>
 
-        <!-- The same for a doctor ("Set as doctor in Medicine"). -->
+        <!-- The same for a doctor, also open for any app to call. -->
         <activity
             android:name=".share.SetDoctorActivity"
             android:exported="true"

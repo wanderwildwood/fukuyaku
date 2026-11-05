@@ -37,8 +37,8 @@ import com.wanderwildwood.fukuyaku.ui.monochrome
 import com.wanderwildwood.fukuyaku.ui.ArmedScope
 
 /**
- * A pharmacy or a doctor handed over by another app: Contacts' "Set as pharmacy in Medicine"
- * and "Set as doctor in Medicine". Both belong to each medicine, so this asks which ones,
+ * A pharmacy or a doctor handed over by another app; the actions are open for any app to call
+ * (see "For other apps" in the README). Both belong to each medicine, so this asks which ones,
  * every medicine ticked to start, and nothing changes until Set is pressed. Then each ticked
  * medicine gets it exactly as if it had been chosen from Contacts on its own page.
  *
@@ -171,7 +171,7 @@ abstract class SetWhoActivity(
     }
 }
 
-/** Contacts' "Set as pharmacy in Medicine". */
+/** A pharmacy from any app that calls SET_PHARMACY. */
 class SetPharmacyActivity : SetWhoActivity(
     R.string.edit_pharmacy, R.string.pharmacy_set_ask, R.string.pharmacy_set_none, R.string.pharmacy_set_yes, R.plurals.pharmacy_set_done,
 ) {
@@ -181,7 +181,7 @@ class SetPharmacyActivity : SetWhoActivity(
     override fun current(m: Medicine) = m.pharmacyName.ifBlank { m.pharmacyNumber }
 }
 
-/** Contacts' "Set as doctor in Medicine". */
+/** A doctor from any app that calls SET_DOCTOR. */
 class SetDoctorActivity : SetWhoActivity(
     R.string.edit_doctor, R.string.doctor_set_ask, R.string.doctor_set_none, R.string.doctor_set_yes, R.plurals.doctor_set_done,
 ) {

@@ -91,8 +91,7 @@ not the log, what is left, the pharmacy, or the doctor's number.
 - An app targeting Android 11 or later also needs
   `<queries><package android:name="com.wanderwildwood.fukuyaku" /></queries>`.
 
-Another app can also offer a pharmacy. Connections does it from a person's More page ("Set as
-pharmacy in Medicine"). Medicine shows the name and number with every medicine ticked; you
+Any app can also offer a pharmacy. Medicine shows the name and number with every medicine ticked; you
 untick any that use a different pharmacy and press **Set pharmacy**. Each ticked medicine then
 has it, as if chosen from Contacts on its own page.
 
