@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import com.mudita.mmd.ThemeMMD
 import com.wanderwildwood.fukuyaku.alarm.Notifier
 import com.wanderwildwood.fukuyaku.alarm.Reminders
+import com.wanderwildwood.fukuyaku.data.MedicineLink
 import com.wanderwildwood.fukuyaku.ui.MedicineApp
 import com.wanderwildwood.fukuyaku.ui.houseTypography
 import com.wanderwildwood.fukuyaku.ui.monochrome
@@ -17,7 +18,7 @@ import com.wanderwildwood.fukuyaku.ui.ArmedScope
 
 class MainActivity : ComponentActivity() {
 
-    /** A medicine to open straight away, from a refill notice. */
+    /** A medicine to open straight away, from a refill notice or its refill event in the calendar. */
     private val opening = mutableStateOf<Long?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +50,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun medicineIn(intent: Intent?): Long? =
-        intent?.getLongExtra(EXTRA_MEDICINE, -1L)?.takeIf { it > 0 }
+        MedicineLink.id(intent) ?: intent?.getLongExtra(EXTRA_MEDICINE, -1L)?.takeIf { it > 0 }
 
     companion object {
         const val EXTRA_MEDICINE = "medicine"

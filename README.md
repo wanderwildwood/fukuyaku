@@ -69,7 +69,8 @@ DuraSpeed stops the app again later, the step comes back.
   any dose not marked, on the lock screen. It is off until **Settings → Next dose on the lock
   screen** is turned on, because it names medicines to anyone who picks up the phone.
 - **Datebook** ([koyomi](https://github.com/wanderwildwood/koyomi)), or any calendar app,
-  opens with the refill filled in.
+  opens with the refill filled in. In Datebook the refill event then has **Open in
+  Medicine**, which opens that medicine's page (or the list, if it has since been deleted).
 - **Connections** ([enishi](https://github.com/wanderwildwood/enishi)), or the phone's own, is
   where the pharmacy and the doctor are chosen from, and **Open in Contacts** goes back to them.
 - **Memo**, **Mailbox** and **Messaging** take the log through **Share as text**; **Cabinet**

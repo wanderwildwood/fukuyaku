@@ -54,6 +54,7 @@ import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
 import com.wanderwildwood.fukuyaku.alarm.Reminders
 import com.wanderwildwood.fukuyaku.data.Medicine
+import com.wanderwildwood.fukuyaku.data.MedicineLink
 import com.wanderwildwood.fukuyaku.data.Plan
 import com.wanderwildwood.fukuyaku.data.Store
 import java.time.DayOfWeek
@@ -300,13 +301,16 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                                         // A plain timed event, 09:00 for half an hour, the shape every calendar takes; an
                                         // all-day one with its own time-zone rules is what Mudita's calendar choked on.
                                         val begin = on.atTime(9, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                                        // The medicine's number, saved just above, so the event can lead back to it.
+                                        val linked = original?.id ?: savedId
                                         context.startActivity(
                                             Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI)
                                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                                 .putExtra(CalendarContract.Events.TITLE, title)
                                                 .putExtra(CalendarContract.Events.DESCRIPTION, text)
                                                 .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, begin)
-                                                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, begin + 30 * 60_000L),
+                                                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, begin + 30 * 60_000L)
+                                                .let { if (linked > 0) MedicineLink.put(context, it, linked) else it },
                                         )
                                     }.isSuccess
                                     if (!handed) {

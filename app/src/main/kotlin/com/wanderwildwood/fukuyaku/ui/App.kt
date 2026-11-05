@@ -37,10 +37,18 @@ fun MedicineApp(opening: Long?, onOpened: () -> Unit) {
     var settings by rememberSaveable { mutableStateOf(false) }
     var about by rememberSaveable { mutableStateOf(false) }
 
+    // A medicine deleted since its notice or calendar event was made opens the list instead of
+    // an empty page that would save as a new medicine.
+    val context = androidx.compose.ui.platform.LocalContext.current
     LaunchedEffect(opening) {
         if (opening != null) {
             settings = false
-            editing = opening
+            if (com.wanderwildwood.fukuyaku.data.Store.get(context).medicine(opening) != null) {
+                editing = opening
+            } else {
+                editing = null
+                tab = 1
+            }
             onOpened()
         }
     }
@@ -62,7 +70,6 @@ fun MedicineApp(opening: Long?, onOpened: () -> Unit) {
     if (about) AboutDialog(onDismiss = { about = false })
 
     // Said once, on the first start: what this is not. About carries the same words for good.
-    val context = androidx.compose.ui.platform.LocalContext.current
     val appSettings = remember { com.wanderwildwood.fukuyaku.data.Settings(context) }
     var firstRun by rememberSaveable { mutableStateOf(!appSettings.disclaimerSeen) }
     if (firstRun) {
