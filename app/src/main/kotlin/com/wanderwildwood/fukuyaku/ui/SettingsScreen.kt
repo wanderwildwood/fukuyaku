@@ -3,7 +3,6 @@ package com.wanderwildwood.fukuyaku.ui
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import com.wanderwildwood.fukuyaku.data.Backup
 import com.wanderwildwood.fukuyaku.data.BackupFiles
 import android.provider.Settings as AndroidSettings
@@ -54,12 +53,12 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     var pickAgain by remember { mutableStateOf(false) }
     BackHandler { onBack() }
 
-    val saveBackup = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+    val saveBackup = rememberLauncherForActivityResult(FilesCreateDocument("application/json")) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         val ok = BackupFiles.save(context, uri)
         Toast.makeText(context, context.getString(if (ok) R.string.backup_saved else R.string.backup_not_saved), if (ok) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
     }
-    val restoreBackup = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+    val restoreBackup = rememberLauncherForActivityResult(FilesOpenDocument(writable = false)) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         val message = when (val r = BackupFiles.restore(context, uri)) {
             is BackupFiles.Result.Done -> context.getString(R.string.restore_done, r.medicines, r.doses)

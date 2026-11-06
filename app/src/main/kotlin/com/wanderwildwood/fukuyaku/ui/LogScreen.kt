@@ -3,7 +3,6 @@ package com.wanderwildwood.fukuyaku.ui
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -71,7 +70,7 @@ fun LogScreen() {
     }
     var chosen by remember { mutableStateOf<Dose?>(null) }
 
-    val save = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
+    val save = rememberLauncherForActivityResult(FilesCreateDocument("text/csv")) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         val all = Store.get(context).all()
         val doctors = Export.doctorsById(Store.get(context).medicines())

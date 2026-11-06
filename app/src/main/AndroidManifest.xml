@@ -25,6 +25,8 @@
         <package android:name="com.mediatek.duraspeed" />
         <!-- Glance, the lock-screen panel: its switch in Settings shows only when it is there. -->
         <package android:name="com.wanderwildwood.hitome" />
+        <!-- Files (Cabinet): opens and saves files on e-ink screens when it is there. -->
+        <package android:name="com.wanderwildwood.tana" />
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
             <data android:mimeType="text/plain" />
