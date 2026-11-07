@@ -102,7 +102,7 @@ abstract class SetWhoActivity(
                                 text = stringResource(if (medicines.isEmpty()) none else ask),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
-                            PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                            PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth(), showCutRow = true) {
                                 medicines.forEach { m ->
                                     item(key = m.id) {
                                         val now = current(m).takeIf { it.isNotBlank() && it != given.name.ifBlank { given.number } }

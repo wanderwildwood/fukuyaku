@@ -185,7 +185,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
             )
         },
     ) { padding ->
-        PagedColumn(modifier = Modifier.padding(padding).fillMaxSize(), state = listState, contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp)) {
+        PagedColumn(modifier = Modifier.padding(padding).fillMaxSize(), state = listState, contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp), showCutRow = true) {
             problem?.let { p ->
                 item(key = "problem") {
                     TextMMD(

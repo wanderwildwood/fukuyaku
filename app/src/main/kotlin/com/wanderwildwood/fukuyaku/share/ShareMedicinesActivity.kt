@@ -70,7 +70,7 @@ class ShareMedicinesActivity : ComponentActivity() {
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
                             )
-                            PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                            PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth(), showCutRow = true) {
                                 lines.forEachIndexed { i, line ->
                                     item(key = i) {
                                         TextMMD(text = line, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(vertical = 8.dp))

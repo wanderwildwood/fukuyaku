@@ -97,7 +97,7 @@ fun TodayScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit) {
     // The dose taken when needed is being given an earlier time than now.
     var takingEarlier by remember(taking) { mutableStateOf(false) }
 
-    PagedColumn(modifier = Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp)) {
+    PagedColumn(modifier = Modifier.fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp), showCutRow = true) {
         item(key = "top") { Spacer(Modifier.height(8.dp)) }
         problems.forEachIndexed { i, p -> item(key = "problem:$i") { ProblemCard(p) } }
 
