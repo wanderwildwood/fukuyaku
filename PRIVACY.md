@@ -41,8 +41,8 @@ the medicines.
 - **Share as text** and **Save as CSV**, on the Log tab, hand the log to an app or a folder you
   choose.
 - **Call** and **Text**, on a medicine's page, open the phone's dialer or messaging app with
-  the pharmacy's number; **Put the refill in the calendar** opens the calendar's editor with
-  the event filled in. Nothing is sent until you send it there.
+  the pharmacy's number; **Put the refill in the calendar** opens Datebook's editor, and no
+  other calendar app's, with the event filled in. Nothing is sent until you send it there.
 
 ## Other apps
 

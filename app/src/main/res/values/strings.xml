@@ -205,8 +205,7 @@
 
     <string name="refill_copy_date">Copy the refill date</string>
     <string name="refill_date_copied">The refill date is copied. Paste it into a note or a calendar.</string>
-    <string name="calendar_would_not_take_it">The calendar would not take it. The refill date is copied instead.</string>
-    <string name="no_calendar">There is no calendar on this phone to put it in.</string>
+    <string name="datebook_failed">Datebook could not be opened. The refill date is copied instead.</string>
     <string name="no_contacts">There is no contacts app on this phone that can be chosen from.</string>
     <string name="no_dialer">There is nothing on this phone to call with.</string>
     <string name="no_messaging">There is nothing on this phone to send a text with.</string>
@@ -327,7 +326,7 @@
     <string name="about_title">Medicine %1$s</string>
     <string name="about_what">Reminders and a log of what was taken. The app has no internet permission. It reminds, and does not advise; what to take and when is for a doctor or pharmacist to say.</string>
     <string name="about_privacy_head">Privacy</string>
-    <string name="about_privacy">Everything you put in this app stays on this phone. It has no internet access, so nothing is sent anywhere, and nothing is collected about you. There are no ads, no analytics and no tracking. Your medicines and the log are shared only when another app asks and you press Share, or when you press Share as text or Save as CSV, and then only with the app or folder you choose. Call, Text and Put the refill in the calendar open your phone\'s own apps with the pharmacy\'s number or the event filled in, and nothing is sent until you send it there. If you turn on Next dose on the lock screen, medicine names and times are shown on the lock screen for anyone holding the phone to read. Otherwise a reminder follows the phone\'s own lock-screen setting.</string>
+    <string name="about_privacy">Everything you put in this app stays on this phone. It has no internet access, so nothing is sent anywhere, and nothing is collected about you. There are no ads, no analytics and no tracking. Your medicines and the log are shared only when another app asks and you press Share, or when you press Share as text or Save as CSV, and then only with the app or folder you choose. Call and Text open your phone\'s own apps with the pharmacy\'s number filled in, and Put the refill in the calendar opens Datebook with the event filled in, and nothing is sent until you send it there. If you turn on Next dose on the lock screen, medicine names and times are shown on the lock screen for anyone holding the phone to read. Otherwise a reminder follows the phone\'s own lock-screen setting.</string>
     <string name="about_terms_head">Terms</string>
     <string name="about_terms">This app is free software under the GNU General Public License v3. It comes with no warranty: use it at your own risk.</string>
     <string name="about_disclaimer_head">Medical disclaimer</string>

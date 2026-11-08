@@ -25,6 +25,9 @@
         <package android:name="com.mediatek.duraspeed" />
         <!-- Glance, the lock-screen panel: its switch in Settings shows only when it is there. -->
         <package android:name="com.wanderwildwood.hitome" />
+        <!-- Datebook, the only calendar "Put the refill in the calendar" goes to: the button
+             shows only while it is there to take the event (data/Datebook.kt). -->
+        <package android:name="com.wanderwildwood.koyomi" />
         <!-- Files (Cabinet): opens and saves files on e-ink screens when it is there. -->
         <package android:name="com.wanderwildwood.tana" />
         <intent>

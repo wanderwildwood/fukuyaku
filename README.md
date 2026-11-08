@@ -32,7 +32,8 @@ ships with.
   did not ring, and the first screen says when the app was stopped.
 - **Counts what is left**, if you want it to, and says once when it gets low. From there the
   pharmacy is a press away: **Call** or **Text** it, chosen from Contacts or typed in, and the
-  refill can go into the calendar with **Put the refill in the calendar**. Each medicine can
+  refill can go into Datebook with **Put the refill in the calendar** (or **Copy the refill
+  date**, to paste anywhere). Each medicine can
   name its doctor the same way, to call or text about it.
 - **The log** shows each medicine's last 7 and 30 days and a strip of the last fortnight, then
   every dose by day. A dose marked late can be marked as taken at its time or just now. It can
@@ -68,8 +69,9 @@ DuraSpeed stops the app again later, the step comes back.
 - **Glance** ([hitome](https://github.com/wanderwildwood/hitome)) can show the next dose, and
   any dose not marked, on the lock screen. It is off until **Settings → Next dose on the lock
   screen** is turned on, because it names medicines to anyone who picks up the phone.
-- **Datebook** ([koyomi](https://github.com/wanderwildwood/koyomi)), or any calendar app,
-  opens with the refill filled in. In Datebook the refill event then has **Open in
+- **Datebook** ([koyomi](https://github.com/wanderwildwood/koyomi)), and only Datebook,
+  opens with the refill filled in: the button is there when Datebook is installed, and no
+  other calendar app is handed the event. The refill event then has **Open in
   Medicine**, which opens that medicine's page (or the list, if it has since been deleted).
 - **Connections** ([enishi](https://github.com/wanderwildwood/enishi)), or the phone's own, is
   where the pharmacy and the doctor are chosen from, and **Open in Contacts** goes back to them.

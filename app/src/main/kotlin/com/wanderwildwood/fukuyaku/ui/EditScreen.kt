@@ -53,6 +53,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
 import com.wanderwildwood.fukuyaku.alarm.Reminders
+import com.wanderwildwood.fukuyaku.data.Datebook
 import com.wanderwildwood.fukuyaku.data.Medicine
 import com.wanderwildwood.fukuyaku.data.MedicineLink
 import com.wanderwildwood.fukuyaku.data.Plan
@@ -111,6 +112,13 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
             if (now.second != was.second && Doctor.of(d) == was.second) d = Doctor.into(d, now.second)
             seen = now
         }
+        onPauseOrDispose { }
+    }
+    // Whether Datebook is there to take the refill, asked again each time the page comes back,
+    // so Datebook put on or taken off meanwhile is seen.
+    var datebook by remember { mutableStateOf(false) }
+    LifecycleResumeEffect(Unit) {
+        datebook = Datebook.takes(Datebook.answering(context.packageManager))
         onPauseOrDispose { }
     }
 
@@ -288,41 +296,44 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                                 style = MaterialTheme.typography.labelSmall,
                             )
                             Spacer(Modifier.height(8.dp))
-                            OutlinedButtonMMD(
+                            // Only to Datebook, and only while it is there: another calendar app
+                            // may crash on the event in its own process, out of our reach.
+                            if (datebook) OutlinedButtonMMD(
                                 onClick = {
                                     // Nothing in this hand-off may take the page down: every step is
-                                    // caught, the form is saved first, and a calendar that cannot take
-                                    // the event is said so in words with the date copied instead.
+                                    // caught, the form is saved first, and if Datebook does not open
+                                    // it is said so in words with the date copied instead.
                                     val on = LocalDate.now().plusDays(maxOf(0, days - 3).toLong())
                                     val title = context.getString(R.string.refill_event_title, counted.name)
                                     val text = context.resources.getQuantityString(R.plurals.refill_event_text, counted.left ?: 0, (counted.left ?: 0).toString(), Times.day(context, LocalDate.now()))
                                     runCatching { save() }
                                     val handed = runCatching {
-                                        // A plain timed event, 09:00 for half an hour, the shape every calendar takes; an
-                                        // all-day one with its own time-zone rules is what Mudita's calendar choked on.
+                                        // A plain timed event, 09:00 for half an hour.
                                         val begin = on.atTime(9, 0).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                                         // The medicine's number, saved just above, so the event can lead back to it.
                                         val linked = original?.id ?: savedId
                                         context.startActivity(
-                                            Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI)
+                                            Datebook.request()
                                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                                 .putExtra(CalendarContract.Events.TITLE, title)
                                                 .putExtra(CalendarContract.Events.DESCRIPTION, text)
+                                                .putExtra(CalendarContract.Events.EVENT_LOCATION, "")
                                                 .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, begin)
                                                 .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, begin + 30 * 60_000L)
+                                                .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false)
                                                 .let { if (linked > 0) MedicineLink.put(context, it, linked) else it },
                                         )
                                     }.isSuccess
                                     if (!handed) {
                                         copyRefillDate(context, title, Times.day(context, on))
-                                        Toast.makeText(context, context.getString(R.string.calendar_would_not_take_it), Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context, context.getString(R.string.datebook_failed), Toast.LENGTH_LONG).show()
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth().height(48.dp),
                             ) { TextMMD(text = stringResource(R.string.refill_to_calendar), style = MaterialTheme.typography.bodySmall) }
-                            Spacer(Modifier.height(8.dp))
-                            // The way that cannot fail: if the calendar app crashes on the event,
-                            // the date can still be kept.
+                            if (datebook) Spacer(Modifier.height(8.dp))
+                            // The way that cannot fail, and the way without Datebook: the date
+                            // is copied, to paste into a note or any calendar by hand.
                             OutlinedButtonMMD(
                                 onClick = {
                                     val on = LocalDate.now().plusDays(maxOf(0, days - 3).toLong())
