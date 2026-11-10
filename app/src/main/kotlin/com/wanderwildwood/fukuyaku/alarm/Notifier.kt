@@ -24,8 +24,13 @@ import com.wanderwildwood.fukuyaku.data.Store
  */
 object Notifier {
 
-    const val DOSES = "doses"
-    const val REFILLS = "refills"
+    const val DOSES = "doses_light"
+    const val REFILLS = "refills_light"
+
+    // A channel's settings are frozen once it exists, the light among them, so the ones made
+    // before the light was asked for move to a new id (LightChannel).
+    private const val DOSES_NO_LIGHT = "doses"
+    private const val REFILLS_NO_LIGHT = "refills"
 
     /** The test reminder's number, which no dose can have. */
     const val TEST_ID = Int.MAX_VALUE - 1
@@ -35,14 +40,18 @@ object Notifier {
 
     fun channels(context: Context) {
         val nm = context.getSystemService(NotificationManager::class.java)
-        nm.createNotificationChannel(
+        LightChannel.ensure(
+            nm,
+            DOSES_NO_LIGHT,
             NotificationChannel(DOSES, context.getString(R.string.channel_doses), NotificationManager.IMPORTANCE_HIGH).apply {
                 description = context.getString(R.string.channel_doses_about)
                 enableVibration(true)
                 lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE
             },
         )
-        nm.createNotificationChannel(
+        LightChannel.ensure(
+            nm,
+            REFILLS_NO_LIGHT,
             NotificationChannel(REFILLS, context.getString(R.string.channel_refills), NotificationManager.IMPORTANCE_DEFAULT),
         )
     }
