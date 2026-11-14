@@ -124,6 +124,11 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                     v++
                 }
             }
+            item(key = "dark") {
+                SwitchRow(stringResource(R.string.settings_dark), DarkMode.on, note = stringResource(R.string.settings_dark_note)) {
+                    DarkMode.set(context, it)
+                }
+            }
             item(key = "alarm_clock") {
                 SwitchRow(stringResource(R.string.settings_alarm_clock), alarmClock, note = stringResource(R.string.settings_alarm_clock_note)) {
                     s.asAlarmClock = it
