@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.CalendarContract
 import android.provider.ContactsContract
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -81,6 +80,9 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
     var savedId by rememberSaveable(id) { mutableStateOf(0L) }
     fun base(): Medicine? = original ?: savedId.takeIf { it != 0L }?.let { store.medicine(it) }
     var problem by remember { mutableStateOf<Int?>(null) }
+    // What a button here did, or could not do, in words along the foot until the next press:
+    // on this panel a message on a timer could be gone before it had been read.
+    var notice by remember { mutableStateOf<String?>(null) }
     var leaving by rememberArmedFlag(disarmOnBack = false)
     var pickTime by remember { mutableStateOf<Int?>(null) }
     var pickHoursFrom by remember { mutableStateOf(false) }
@@ -167,20 +169,20 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                 }
             }
         }.onFailure {
-            Toast.makeText(context, context.getString(R.string.pharmacy_unreadable), Toast.LENGTH_LONG).show()
+            notice = context.getString(R.string.pharmacy_unreadable)
         }
     }
 
     fun open(intent: Intent, failure: Int) {
         runCatching { context.startActivity(intent) }
-            .onFailure { Toast.makeText(context, context.getString(failure), Toast.LENGTH_LONG).show() }
+            .onFailure { notice = context.getString(failure) }
     }
 
     fun choose() {
         runCatching {
             pick.launch(Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI))
         }.onFailure {
-            Toast.makeText(context, context.getString(R.string.no_contacts), Toast.LENGTH_LONG).show()
+            notice = context.getString(R.string.no_contacts)
         }
     }
 
@@ -192,6 +194,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                 navigationIcon = { BarButton(Icons.Back, stringResource(R.string.cd_back)) { back() } },
             )
         },
+        bottomBar = { notice?.let { NoticeLine(it) { notice = null } } },
     ) { padding ->
         PagedColumn(modifier = Modifier.padding(padding).fillMaxSize(), state = listState, contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp), showCutRow = true) {
             problem?.let { p ->
@@ -326,7 +329,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                                     }.isSuccess
                                     if (!handed) {
                                         copyRefillDate(context, title, Times.day(context, on))
-                                        Toast.makeText(context, context.getString(R.string.datebook_failed), Toast.LENGTH_LONG).show()
+                                        notice = context.getString(R.string.datebook_failed)
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -338,7 +341,7 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
                                 onClick = {
                                     val on = LocalDate.now().plusDays(maxOf(0, days - 3).toLong())
                                     copyRefillDate(context, context.getString(R.string.refill_event_title, counted.name), Times.day(context, on))
-                                    Toast.makeText(context, context.getString(R.string.refill_date_copied), Toast.LENGTH_LONG).show()
+                                    notice = context.getString(R.string.refill_date_copied)
                                 },
                                 modifier = Modifier.fillMaxWidth().height(48.dp),
                             ) { TextMMD(text = stringResource(R.string.refill_copy_date), style = MaterialTheme.typography.bodySmall) }
