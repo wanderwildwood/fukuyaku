@@ -101,7 +101,7 @@ private fun Ringing(onDone: () -> Unit) {
             if (test) {
                 item(key = "test") {
                     Column(Modifier.padding(vertical = 12.dp)) {
-                        TextMMD(text = stringResource(R.string.test_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        TextMMD(text = stringResource(R.string.test_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(6.dp))
                         TextMMD(text = stringResource(R.string.test_screen), style = MaterialTheme.typography.bodyMedium)
                     }
@@ -149,7 +149,7 @@ private fun RingingDose(d: Dose) {
     val context = LocalContext.current
     val notes = remember(d.medicineId) { Store.get(context).medicine(d.medicineId)?.notes.orEmpty() }
     Column(Modifier.padding(vertical = 12.dp)) {
-        TextMMD(text = d.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        TextMMD(text = d.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         if (d.amount.isNotBlank()) TextMMD(text = d.amount, style = MaterialTheme.typography.titleMedium)
         TextMMD(
             text = stringResource(R.string.notify_due, Times.whenShort(context, d.due)),
