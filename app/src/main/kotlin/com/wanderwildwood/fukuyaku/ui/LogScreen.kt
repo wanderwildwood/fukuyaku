@@ -1,7 +1,6 @@
 package com.wanderwildwood.fukuyaku.ui
 
 import android.content.Intent
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -69,6 +68,8 @@ fun LogScreen() {
         value = withContext(Dispatchers.IO) { Store.get(context).all() }
     }
     var chosen by remember { mutableStateOf<Dose?>(null) }
+    // Whether the file was saved, in words under the buttons, until the next press.
+    var notice by remember { mutableStateOf<String?>(null) }
 
     val save = rememberLauncherForActivityResult(FilesCreateDocument("text/csv")) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -78,9 +79,9 @@ fun LogScreen() {
             context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(Export.csv(all, zone, doctors).toByteArray()) }
                 ?: error("no stream")
         }.onSuccess {
-            Toast.makeText(context, context.getString(R.string.log_saved), Toast.LENGTH_SHORT).show()
+            notice = context.getString(R.string.log_saved)
         }.onFailure {
-            Toast.makeText(context, context.getString(R.string.log_not_saved), Toast.LENGTH_LONG).show()
+            notice = context.getString(R.string.log_not_saved)
         }
     }
 
@@ -125,11 +126,12 @@ fun LogScreen() {
                 OutlinedButtonMMD(
                     onClick = {
                         runCatching { save.launch("medicine-log-$today.csv") }
-                            .onFailure { Toast.makeText(context, context.getString(R.string.log_not_saved), Toast.LENGTH_LONG).show() }
+                            .onFailure { notice = context.getString(R.string.log_not_saved) }
                     },
                     modifier = Modifier.weight(1f).height(48.dp),
                 ) { TextMMD(text = stringResource(R.string.log_save_csv), style = MaterialTheme.typography.bodySmall) }
             }
+            notice?.let { NoticeLine(it, horizontal = 0.dp) { notice = null } }
             DottedRule(start = 0.dp, end = 0.dp)
         }
         for ((day, those) in byDay) {

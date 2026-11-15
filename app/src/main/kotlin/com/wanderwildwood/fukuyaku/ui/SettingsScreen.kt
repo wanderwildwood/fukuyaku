@@ -1,13 +1,14 @@
 package com.wanderwildwood.fukuyaku.ui
 
 import android.content.Intent
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import com.wanderwildwood.fukuyaku.data.Backup
 import com.wanderwildwood.fukuyaku.data.BackupFiles
 import android.provider.Settings as AndroidSettings
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.mudita.mmd.components.text.TextMMD
@@ -52,11 +56,14 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     var pickSnooze by remember { mutableStateOf(false) }
     var pickAgain by remember { mutableStateOf(false) }
     BackHandler { onBack() }
+    // What the last backup or restore did, in words along the foot. It stays until the next
+    // press: on this panel a message on a timer could be gone before it had been read.
+    var notice by remember { mutableStateOf<String?>(null) }
 
     val saveBackup = rememberLauncherForActivityResult(FilesCreateDocument("application/json")) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         val ok = BackupFiles.save(context, uri)
-        Toast.makeText(context, context.getString(if (ok) R.string.backup_saved else R.string.backup_not_saved), if (ok) Toast.LENGTH_SHORT else Toast.LENGTH_LONG).show()
+        notice = context.getString(if (ok) R.string.backup_saved else R.string.backup_not_saved)
     }
     val restoreBackup = rememberLauncherForActivityResult(FilesOpenDocument(writable = false)) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -71,7 +78,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
             )
             BackupFiles.Result.Unreadable -> context.getString(R.string.restore_unreadable)
         }
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        notice = message
         v++
     }
 
@@ -104,6 +111,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                 actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
             )
         },
+        bottomBar = { notice?.let { NoticeLine(it) { notice = null } } },
     ) { padding ->
         PagedColumn(modifier = Modifier.padding(padding).fillMaxSize(), contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 20.dp, end = 12.dp)) {
             item { Spacer(Modifier.height(8.dp)) }
@@ -214,3 +222,21 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
 
 private fun minutes(context: android.content.Context, n: Int): String =
     context.resources.getQuantityString(R.plurals.minutes, n, n.toString())
+
+/** A short thing to say along the foot, in plain words, until the next press. */
+@Composable
+internal fun NoticeLine(text: String, horizontal: androidx.compose.ui.unit.Dp = 20.dp, onSeen: () -> Unit) {
+    LaunchedEffect(text) {
+        NextPress.await()
+        onSeen()
+    }
+    TextMMD(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onSeen)
+            .semantics { liveRegion = LiveRegionMode.Polite }
+            .padding(horizontal = horizontal, vertical = 12.dp),
+    )
+}
