@@ -1,5 +1,6 @@
 package com.wanderwildwood.fukuyaku
 
+import com.wanderwildwood.fukuyaku.ui.DarkSelection
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -37,14 +38,14 @@ class MainActivity : ComponentActivity() {
         Notifier.channels(this)
         if (savedInstanceState == null) opening.value = medicineIn(intent)
         setContent {
-            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                 ArmedScope {
                     // A blinking cursor redraws the screen twice a second for nothing, on e-ink.
                     CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
                         MedicineApp(opening = opening.value, onOpened = { opening.value = null })
                     }
                 }
-            }
+            } }
         }
     }
 

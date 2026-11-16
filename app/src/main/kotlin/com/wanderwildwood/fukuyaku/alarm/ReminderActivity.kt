@@ -1,5 +1,6 @@
 package com.wanderwildwood.fukuyaku.alarm
 
+import com.wanderwildwood.fukuyaku.ui.DarkSelection
 import com.wanderwildwood.fukuyaku.ui.PagedColumn
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -52,13 +53,13 @@ class ReminderActivity : ComponentActivity() {
         setShowWhenLocked(true)
         setTurnScreenOn(true)
         setContent {
-            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                 ArmedScope {
                     Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
                         Ringing(onDone = ::finish)
                     }
                 }
-            }
+            } }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.wanderwildwood.fukuyaku.share
 
+import com.wanderwildwood.fukuyaku.ui.DarkSelection
 import com.wanderwildwood.fukuyaku.ui.PagedColumn
 import android.app.Activity
 import android.content.Context
@@ -55,7 +56,7 @@ class ShareMedicinesActivity : ComponentActivity() {
         }
         val canShare = asker != null
         setContent {
-            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                 ArmedScope {
                     BackHandler { finish() }
                     Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
@@ -99,7 +100,7 @@ class ShareMedicinesActivity : ComponentActivity() {
                         }
                     }
                 }
-            }
+            } }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.wanderwildwood.fukuyaku.share
 
+import com.wanderwildwood.fukuyaku.ui.DarkSelection
 import com.wanderwildwood.fukuyaku.ui.PagedColumn
 import android.app.Activity
 import android.os.Bundle
@@ -79,7 +80,7 @@ abstract class SetWhoActivity(
             runCatching { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() }.getOrNull() ?: pkg
         }
         setContent {
-            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                 ArmedScope {
                     BackHandler { finish() }
                     var ticked by rememberSaveable { mutableStateOf(medicines.map { it.id }) }
@@ -144,7 +145,7 @@ abstract class SetWhoActivity(
                         }
                     }
                 }
-            }
+            } }
         }
     }
 
