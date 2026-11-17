@@ -56,7 +56,7 @@ class ReminderActivity : ComponentActivity() {
             ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                 ArmedScope {
                     Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
-                        Ringing(onDone = ::finish)
+                        Ringing(onDone = ::finish, opened = intent?.data?.toString())
                     }
                 }
             } }
@@ -65,7 +65,7 @@ class ReminderActivity : ComponentActivity() {
 }
 
 @Composable
-private fun Ringing(onDone: () -> Unit) {
+private fun Ringing(onDone: () -> Unit, opened: String? = null) {
     val context = LocalContext.current
     val version by Store.version.collectAsState()
     val settings = remember { Settings(context) }
@@ -83,7 +83,8 @@ private fun Ringing(onDone: () -> Unit) {
                 .mapNotNull { (_, those) -> those.maxByOrNull { it.due } }
         }
     }
-    val test = Notifier.TEST_ID in ids
+    // Known from the screen's own address too: the notification may already be gone.
+    val test = Notifier.TEST_ID in ids || opened == "fukuyaku://ringing/${Notifier.TEST_ID}"
 
     // The notification stays until the dose is answered. A phone that takes it away as this
     // screen opens (Mudita's did, and the screen then closed with it) gets it back, quietly,
