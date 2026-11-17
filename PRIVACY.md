@@ -57,6 +57,12 @@ screen; when there is none, nothing can receive the list and Share is not offere
 A reminder's notification follows the phone's own lock-screen setting: where the phone hides
 what notifications say, it reads "A medicine is due" and nothing more.
 
+The reminder screen is another matter. While **Settings → Fill the screen when a reminder
+rings** is on, as it is from the start, a ringing reminder fills the screen over the lock
+screen with the medicine's name, amount, when it was last taken and its notes, whatever the
+phone's lock-screen setting is, and anyone holding the phone can read them. Turn that setting
+off to keep a reminder to its notification.
+
 If the Glance app is installed and **Settings → Next dose on the lock screen** is on, Medicine
 hands Glance the next dose and any dose not yet marked — medicine names and times — to show on
 the lock screen, where anyone holding the phone can read them. It is off until you turn it on.
