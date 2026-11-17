@@ -25,7 +25,7 @@ class BackupTest {
             id = 3, name = "Lisinopril", amount = "10 mg",
             schedule = Schedule.AtTimes(listOf(LocalTime.of(8, 0), LocalTime.of(20, 30)), Days.OnDays(setOf(DayOfWeek.MONDAY, DayOfWeek.FRIDAY))),
             left = 12, perDose = 2, warnAt = 4,
-            pharmacyName = "Corner Pharmacy", pharmacyNumber = "+1 555 010 0101", pharmacyContact = "content://x/1",
+            pharmacyName = "Corner Pharmacy", pharmacyNumber = "+1 555 010 0101", pharmacyContact = "content://com.android.contacts/contacts/lookup/x/1",
             doctorName = "Dr Ada Whitlock", doctorNumber = "+1 555 010 0102", doctorContact = "",
             notes = "With food, \"not\" on an empty stomach\nsecond line", paused = false, caughtUp = 1_700_000_000_000, refillWarned = true,
         ),
