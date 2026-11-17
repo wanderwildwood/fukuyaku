@@ -124,10 +124,10 @@ object Backup {
                     warnAt = o.intOrNull("warn_at"),
                     pharmacyName = o.getString("pharmacy_name"),
                     pharmacyNumber = o.getString("pharmacy_number"),
-                    pharmacyContact = o.getString("pharmacy_contact"),
+                    pharmacyContact = contactEntry(o.getString("pharmacy_contact")),
                     doctorName = o.getString("doctor_name"),
                     doctorNumber = o.getString("doctor_number"),
-                    doctorContact = o.getString("doctor_contact"),
+                    doctorContact = contactEntry(o.getString("doctor_contact")),
                     notes = o.getString("notes"),
                     paused = o.getBoolean("paused"),
                     caughtUp = o.getLong("caught_up"),
@@ -167,3 +167,11 @@ object Backup {
     private fun JSONObject.intOrNull(key: String): Int? = if (isNull(key)) null else getInt(key)
     private fun JSONObject.longOrNull(key: String): Long? = if (isNull(key)) null else getLong(key)
 }
+
+/**
+ * A contact link from a backup file, kept only when it is an entry in the phone's Contacts, as
+ * Set as pharmacy or doctor accepts it; anything else is dropped, so Open in Contacts can only
+ * ever open a contact.
+ */
+internal fun contactEntry(raw: String): String =
+    raw.trim().takeIf { it.startsWith("content://com.android.contacts/") && it.length <= 500 }.orEmpty()

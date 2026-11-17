@@ -116,6 +116,18 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
         }
         onPauseOrDispose { }
     }
+    // The count as this page first read it, kept across a restart of the app: doses marked
+    // taken meanwhile (from a reminder) come into the page, unless the count was changed here
+    // by hand, so Back does not write the old count over them.
+    var seenLeft by rememberSaveable(id) { mutableStateOf(original?.left?.toString().orEmpty()) }
+    LifecycleResumeEffect(id) {
+        val fresh = original?.let { store.medicine(it.id) }?.left?.toString().orEmpty()
+        if (original != null && fresh != seenLeft) {
+            if (d.left == seenLeft) d = d.copy(left = fresh)
+            seenLeft = fresh
+        }
+        onPauseOrDispose { }
+    }
     // Whether Datebook is there to take the refill, asked again each time the page comes back,
     // so Datebook put on or taken off meanwhile is seen.
     var datebook by remember { mutableStateOf(false) }
