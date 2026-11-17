@@ -45,9 +45,16 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.ZoneId
 
-/** What a medicine's last fortnight looked like, for the top of the log. */
-private data class Summary(
+/**
+ * What a medicine's last fortnight looked like, for the top of the log. It is one medicine
+ * entry, by its id: two entries can share a name and amount (one deleted and added again, or
+ * the same medicine once on a schedule and once as needed), so the name alone is not a key.
+ */
+internal data class Summary(
+    val medicineId: Long,
     val name: String,
+    /** When its newest dose in the window was due, so the entry in use comes before an older one of the same name. */
+    val latest: Long,
     val week: Plan.Tally,
     val month: Plan.Tally,
     val marks: List<Plan.Mark>,
@@ -105,7 +112,7 @@ fun LogScreen() {
             return@PagedColumn
         }
         for (s in summaries) {
-            item(key = "sum:${s.name}") { SummaryBlock(s) }
+            item(key = "sum:${s.medicineId}") { SummaryBlock(s) }
         }
         item(key = "export") {
             Row(Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
@@ -152,23 +159,26 @@ fun LogScreen() {
     chosen?.let { d -> DoseDialog(d, now, onDismiss = { chosen = null }) }
 }
 
-private fun summaries(doses: List<Dose>, today: LocalDate, zone: ZoneId, now: Long): List<Summary> {
+internal fun summaries(doses: List<Dose>, today: LocalDate, zone: ZoneId, now: Long): List<Summary> {
     val tomorrow = today.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
     val weekAgo = today.minusDays(6).atStartOfDay(zone).toInstant().toEpochMilli()
     val monthAgo = today.minusDays(29).atStartOfDay(zone).toInstant().toEpochMilli()
     val days = (13 downTo 0).map { today.minusDays(it.toLong()) }
     return doses.filter { it.due >= monthAgo && it.due <= now }
         .groupBy { it.medicineId }
-        .map { (_, those) ->
+        .map { (medicineId, those) ->
+            val newest = those.maxBy { it.due }
             Summary(
-                name = those.maxBy { it.due }.label,
+                medicineId = medicineId,
+                name = newest.label,
+                latest = newest.due,
                 week = Plan.tally(those, weekAgo, tomorrow),
                 month = Plan.tally(those, monthAgo, tomorrow),
                 marks = Plan.marks(those, days, zone),
                 asNeededWeek = those.count { it.asNeeded && it.due >= weekAgo },
             )
         }
-        .sortedBy { it.name.lowercase() }
+        .sortedWith(compareBy<Summary> { it.name.lowercase() }.thenByDescending { it.latest }.thenBy { it.medicineId })
 }
 
 @Composable
