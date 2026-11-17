@@ -58,7 +58,14 @@ object Reminders {
             for (due in caught.dues) {
                 val dose = Dose(medicineId = m.id, name = m.name, amount = m.amount, due = due)
                 val id = store.addDose(dose)
-                if (id > 0 && due == caught.rings) ring(context, store, settings, dose.copy(id = id), m, now, zone)
+                if (id > 0 && due == caught.rings) {
+                    ring(context, store, settings, dose.copy(id = id), m, now, zone)
+                } else if (id <= 0 && due == caught.rings) {
+                    // Already in the log: a dose marked taken early and then unmarked. Not marked
+                    // and never rung, it rings now like any other.
+                    store.open().firstOrNull { it.medicineId == m.id && it.due == due && !it.asNeeded && it.rang == null }
+                        ?.let { ring(context, store, settings, it, m, now, zone) }
+                }
             }
             // Kept close to now even when nothing came due, so the next catch-up has little to walk.
             if (m.reminds && (caught.dues.isNotEmpty() || now - m.caughtUp > 6 * 3_600_000L)) {
@@ -71,7 +78,9 @@ object Reminders {
             val at = d.remindAt ?: continue
             if (at > now) continue
             val m = medicines[d.medicineId]
-            if (m == null || m.paused) {
+            // Past the 12 hours a dose may ring in (an old one brought back by a restore): it
+            // stays in the log as not marked, and stops asking.
+            if (m == null || m.paused || now - d.due > Plan.RING_WITHIN_MS) {
                 store.updateDose(d.copy(remindAt = null))
                 continue
             }
@@ -147,9 +156,11 @@ object Reminders {
      */
     fun mark(context: Context, doseId: Long, status: Status, at: Long = System.currentTimeMillis()) = synchronized(lock) {
         val store = Store.get(context)
+        // First, even for a dose no longer in the log (after Clear log or a restore): its
+        // buttons would otherwise do nothing and the notification would stay.
+        Notifier.cancel(context, doseId)
         val dose = store.dose(doseId) ?: return@synchronized
         store.updateDose(Plan.marked(dose, status, at))
-        Notifier.cancel(context, doseId)
         store.medicine(dose.medicineId)?.let {
             recount(context, store, it, dose.status == Status.TAKEN, status == Status.TAKEN)
         }
@@ -170,7 +181,11 @@ object Reminders {
     fun snooze(context: Context, doseId: Long) = synchronized(lock) {
         val store = Store.get(context)
         val settings = Settings(context)
-        val dose = store.dose(doseId) ?: return@synchronized
+        val dose = store.dose(doseId) ?: run {
+            // Gone from the log (Clear log, a restore): the notification goes too.
+            Notifier.cancel(context, doseId)
+            return@synchronized
+        }
         if (dose.status != Status.OPEN) return@synchronized
         val now = System.currentTimeMillis()
         store.updateDose(dose.copy(remindAt = Plan.snooze(now, settings.snoozeMinutes)))
@@ -196,7 +211,12 @@ object Reminders {
     /** A dose of a medicine taken as needed, written down as taken now, or at [at] when it was earlier. */
     fun takeAsNeeded(context: Context, med: Medicine, at: Long = System.currentTimeMillis()) = synchronized(lock) {
         val store = Store.get(context)
-        val id = store.addDose(Plan.asNeeded(med, at))
+        // A second dose given the same minute is a second dose: a millisecond on keeps it apart.
+        var id = -1L
+        for (nudge in 0 until 60) {
+            id = store.addDose(Plan.asNeeded(med, at + nudge))
+            if (id > 0) break
+        }
         if (id > 0) recount(context, store, med, wasTaken = false, nowTaken = true)
         GlanceProvider.changed(context)
     }
