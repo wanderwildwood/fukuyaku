@@ -15,7 +15,7 @@ ships with.
 | | |
 |---|---|
 | ![Today's doses, one taken and one not yet](screenshots/1-today.png) | ![The medicines, with what is left of each](screenshots/2-medicines.png) |
-| ![A medicine's page: how long what is left lasts, the pharmacy](screenshots/3-medicine.png) | ![The log, with the last fortnight](screenshots/4-log.png) |
+| ![A medicine's page: how long what is left lasts, the pharmacy](screenshots/3-medicine.png) | ![The log, with the last two weeks](screenshots/4-log.png) |
 
 ## What it does
 
@@ -35,7 +35,7 @@ ships with.
   refill can go into Datebook with **Put the refill in the calendar** (or **Copy the refill
   date**, to paste anywhere). Each medicine can
   name its doctor the same way, to call or text about it.
-- **The log** shows each medicine's last 7 and 30 days and a strip of the last fortnight, then
+- **The log** shows each medicine's last 7 and 30 days and a strip of the last two weeks, then
   every dose by day. A dose marked late can be marked as taken at its time or just now. It can
   be shared as text, into a note or a message, or saved as a CSV file; both name each
   medicine's doctor, when it has one.

@@ -29,7 +29,7 @@ Everything is in one SQLite file in the app's own storage, `fukuyaku.db`, which 
 can read and which is not backed up (`android:allowBackup="false"`): the medicines as you set
 them up, and one row per dose with when it was due, whether it was taken or skipped, when it
 was marked, and when its reminder rang. A few settings sit in `SharedPreferences`, all of them
-in `data/Settings.kt`.
+in `data/Settings.kt`, plus the dark mode choice in `ui/DarkMode.kt`.
 
 **Save a backup** (Settings) writes the medicines, the log and the choices on the Settings page to one JSON file you choose through the phone's own file picker, and only when you ask. **Restore from a backup** reads such a file the same way, checks all of it first, and only then replaces the medicines and log; a wrong file changes nothing.
 
@@ -41,16 +41,20 @@ the medicines.
 - **Share as text** and **Save as CSV**, on the Log tab, hand the log to an app or a folder you
   choose.
 - **Call** and **Text**, on a medicine's page, open the phone's dialer or messaging app with
-  the pharmacy's number; **Put the refill in the calendar** opens Datebook's editor, and no
+  the pharmacy's or the doctor's number filled in; **Put the refill in the calendar** opens Datebook's editor, and no
   other calendar app's, with the event filled in. Nothing is sent until you send it there.
 
 ## Other apps
 
-Another app can ask for the list of medicines (names, amounts and when they are taken, nothing
-from the log). Medicine shows you the list and the asking app's name first, and hands it over only
+Another app can ask for the list of medicines (names, amounts, when they are taken and the
+doctor's name; not the doctor's number, the pharmacy, the supply or anything from the log). Medicine shows you the list and the asking app's name first, and hands it over only
 when you press **Share** (`share/ShareMedicinesActivity.kt`). There is no way to read it
 without that press. The asking app is named from the system's record of who started the
 screen; when there is none, nothing can receive the list and Share is not offered.
+
+Another app can also offer a contact as a medicine's pharmacy or doctor
+(`share/SetWhoActivity.kt`). Medicine shows what is offered, with the medicines it would go to, and changes nothing until you
+press **Set pharmacy** or **Set doctor**.
 
 ## The lock screen
 
