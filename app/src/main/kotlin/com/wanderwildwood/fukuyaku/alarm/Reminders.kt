@@ -221,10 +221,16 @@ object Reminders {
         GlanceProvider.changed(context)
     }
 
+    /**
+     * The count of [med] moved by a dose. The medicine is read again here, under the lock: the
+     * caller's copy may be from a screen opened a while ago, and a dose marked since (from a
+     * notification) would otherwise be counted back, and a refill warning given twice.
+     */
     private fun recount(context: Context, store: Store, med: Medicine, wasTaken: Boolean, nowTaken: Boolean) {
         if (wasTaken == nowTaken) return
-        val left = Plan.count(med, nowTaken) ?: return
-        var m = med.copy(left = left)
+        val fresh = store.medicine(med.id) ?: return
+        val left = Plan.count(fresh, nowTaken) ?: return
+        var m = fresh.copy(left = left)
         if (m.low && !m.refillWarned) {
             m = m.copy(refillWarned = true)
             Notifier.refill(context, m)
