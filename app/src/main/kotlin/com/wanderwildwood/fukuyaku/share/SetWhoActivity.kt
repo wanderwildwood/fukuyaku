@@ -125,7 +125,12 @@ abstract class SetWhoActivity(
                             if (canSet) {
                                 ButtonMMD(
                                     onClick = {
+                                        // Each read again as it is now: doses marked or a page saved
+                                        // while this screen was up are kept, and a medicine deleted
+                                        // meanwhile is not brought back.
+                                        val store = Store.get(this@SetWhoActivity)
                                         val chosen = medicines.filter { it.id in ticked }
+                                            .mapNotNull { store.medicine(it.id) }
                                         chosen.forEach { m ->
                                             Reminders.save(this@SetWhoActivity, apply(m, given))
                                         }
