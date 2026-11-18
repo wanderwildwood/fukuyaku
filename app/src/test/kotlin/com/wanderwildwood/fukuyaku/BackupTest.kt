@@ -27,11 +27,11 @@ class BackupTest {
             left = 12, perDose = 2, warnAt = 4,
             pharmacyName = "Corner Pharmacy", pharmacyNumber = "+1 555 010 0101", pharmacyContact = "content://com.android.contacts/contacts/lookup/x/1",
             doctorName = "Dr Ada Whitlock", doctorNumber = "+1 555 010 0102", doctorContact = "",
-            notes = "With food, \"not\" on an empty stomach\nsecond line", paused = false, caughtUp = 1_700_000_000_000, refillWarned = true,
+            notes = "With food, \"not\" on an empty stomach\nsecond line", paused = false, caughtUp = 1_793_610_000_000, refillWarned = true,
         ),
         Medicine(id = 5, name = "Ibuprofen", schedule = Schedule.AsNeeded, caughtUp = 5),
         Medicine(id = 9, name = "Vitamin D", amount = "1000 IU", schedule = Schedule.EveryHours(24, LocalDateTime.of(2026, 1, 1, 9, 0)), paused = true),
-        Medicine(id = 11, name = "Iron", schedule = Schedule.AtTimes(listOf(LocalTime.of(7, 0)), Days.EveryN(2, LocalDate.of(2026, 3, 1)))),
+        Medicine(id = 11, name = "Iron", schedule = Schedule.AtTimes(listOf(LocalTime.of(7, 0)), Days.EveryN(2, LocalDate.of(2026, 3, 1))), caughtUp = 1_793_516_400_000),
     )
 
     private val doses = listOf(
@@ -119,6 +119,23 @@ class BackupTest {
         val q = JSONObject(file())
         q.getJSONArray("medicines").getJSONObject(2).put("schedule", "H|169|2026-01-01T09:00")
         refused(q.toString(), Kind.DAMAGED)
+    }
+
+    @Test
+    fun aMedicineThatRemindsIsNotCaughtUpFromLongAgo() {
+        val o = JSONObject(file())
+        val ms = o.getJSONArray("medicines")
+        for (i in 0 until ms.length()) ms.getJSONObject(i).put("caught_up", 0)
+        val back = Backup.read(o.toString()).medicines.associateBy { it.id }
+        // Written 2026-11-02T10:00Z, so no earlier than 31 days before.
+        assertEquals(1_790_935_200_000, back.getValue(3).caughtUp)
+        assertEquals(1_790_935_200_000, back.getValue(11).caughtUp)
+        // As needed and paused ones do not ring, so they are left as they were.
+        assertEquals(0L, back.getValue(5).caughtUp)
+        assertEquals(0L, back.getValue(9).caughtUp)
+        // Without a readable time of writing, the fixed floor still holds.
+        o.put("written", "long ago")
+        assertEquals(Backup.EARLIEST_CAUGHT_UP, Backup.read(o.toString()).medicines.first { it.id == 11L }.caughtUp)
     }
 
     @Test

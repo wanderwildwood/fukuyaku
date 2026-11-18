@@ -22,6 +22,16 @@ object Backup {
     const val FORMAT = "fukuyaku-backup"
     const val VERSION = 1
 
+    /**
+     * A medicine that reminds is caught up no earlier than this: the app did not exist before,
+     * and the app keeps it close to the present, so an older one in a file would only make the
+     * first sync walk years of doses into the log at once.
+     */
+    const val EARLIEST_CAUGHT_UP = 1_790_812_800_000L // 2026-10-01T00:00Z
+
+    /** Nor earlier than this long before the file was written. */
+    const val CAUGHT_UP_WINDOW_MS = 31L * 24 * 60 * 60 * 1000
+
     /** The choices worth carrying to another phone. */
     data class Choices(
         val snoozeMinutes: Int = 10,
@@ -99,6 +109,9 @@ object Backup {
         val version = root.optInt("version", -1)
         if (version > VERSION) throw BackupException(BackupException.Kind.NEWER)
         if (version < 1) throw BackupException(BackupException.Kind.DAMAGED)
+        // An unreadable or early time of writing leaves only the fixed floor.
+        val written = runCatching { Instant.parse(root.getString("written")).toEpochMilli() }.getOrNull()
+        val floor = maxOf(EARLIEST_CAUGHT_UP, (written ?: EARLIEST_CAUGHT_UP).coerceAtLeast(EARLIEST_CAUGHT_UP) - CAUGHT_UP_WINDOW_MS)
         try {
             val c = root.getJSONObject("choices")
             val choices = Choices(
@@ -139,7 +152,7 @@ object Backup {
                     paused = o.getBoolean("paused"),
                     caughtUp = o.getLong("caught_up"),
                     refillWarned = o.getBoolean("refill_warned"),
-                )
+                ).let { if (it.reminds && it.caughtUp < floor) it.copy(caughtUp = floor) else it }
             }
             require(medicines.map { it.id }.toSet().size == medicines.size)
             val da = root.getJSONArray("doses")
