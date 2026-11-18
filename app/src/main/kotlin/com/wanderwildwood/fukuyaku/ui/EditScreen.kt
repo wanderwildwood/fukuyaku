@@ -69,7 +69,7 @@ import java.time.ZoneId
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditScreen(id: Long, onDone: () -> Unit) {
+fun EditScreen(id: Long, onDone: () -> Unit, leave: Int = 0) {
     val context = LocalContext.current
     val store = remember { Store.get(context) }
     val original = remember(id) { if (id == NEW) null else store.medicine(id) }
@@ -157,6 +157,15 @@ fun EditScreen(id: Long, onDone: () -> Unit) {
         }
     }
     BackHandler { back() }
+    // Another medicine asked for from outside (a refill notice, a calendar event): this page is
+    // left as Back leaves it. Only a new ask counts, not one made before this page opened.
+    var heard by rememberSaveable(id) { mutableIntStateOf(leave) }
+    LaunchedEffect(leave) {
+        if (leave != heard) {
+            heard = leave
+            back()
+        }
+    }
 
     // One picker for both: which of them it was opened for is kept across the trip out.
     var picking by rememberSaveable { mutableStateOf("") }

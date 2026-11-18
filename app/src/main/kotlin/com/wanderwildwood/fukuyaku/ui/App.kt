@@ -37,17 +37,33 @@ fun MedicineApp(opening: Long?, onOpened: () -> Unit) {
     var settings by rememberSaveable { mutableStateOf(false) }
     var about by rememberSaveable { mutableStateOf(false) }
 
+    // Where a refill notice or a calendar event asked to go while a medicine's page was open:
+    // that page is left first, as Back leaves it (saved, or asked about when it cannot be),
+    // so what was typed there is not lost. [leaves] counts the asks.
+    var waiting by rememberSaveable { mutableStateOf<Long?>(null) }
+    var leaves by rememberSaveable { mutableIntStateOf(0) }
+    fun go(target: Long) {
+        if (target == LIST) {
+            editing = null
+            tab = 1
+        } else {
+            editing = target
+        }
+    }
+
     // A medicine deleted since its notice or calendar event was made opens the list instead of
     // an empty page that would save as a new medicine.
     val context = androidx.compose.ui.platform.LocalContext.current
     LaunchedEffect(opening) {
         if (opening != null) {
             settings = false
-            if (com.wanderwildwood.fukuyaku.data.Store.get(context).medicine(opening) != null) {
-                editing = opening
+            val target = if (com.wanderwildwood.fukuyaku.data.Store.get(context).medicine(opening) != null) opening else LIST
+            val open = editing
+            if (open != null && open != target) {
+                waiting = target
+                leaves++
             } else {
-                editing = null
-                tab = 1
+                go(target)
             }
             onOpened()
         }
@@ -55,7 +71,15 @@ fun MedicineApp(opening: Long?, onOpened: () -> Unit) {
 
     val edit = editing
     when {
-        edit != null -> EditScreen(id = edit, onDone = { editing = null })
+        edit != null -> EditScreen(
+            id = edit,
+            onDone = {
+                val next = waiting
+                waiting = null
+                if (next != null) go(next) else editing = null
+            },
+            leave = leaves,
+        )
         settings -> SettingsScreen(onBack = { settings = false }, onAbout = { about = true })
         else -> {
             BackHandler(enabled = tab != 0) { tab = 0 }
@@ -98,6 +122,9 @@ fun MedicineApp(opening: Long?, onOpened: () -> Unit) {
 }
 
 const val NEW = 0L
+
+/** Not a medicine: the list of medicines, opened when the one asked for is gone. */
+private const val LIST = -1L
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
