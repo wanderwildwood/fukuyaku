@@ -98,7 +98,7 @@ not the log, what is left, the pharmacy, or the doctor's number.
   `<queries><package android:name="com.wanderwildwood.fukuyaku" /></queries>`.
 
 Any app can also offer a pharmacy. Medicine shows the name and number with every medicine
-ticked; you untick any that use a different pharmacy and press **Set pharmacy**. Each ticked
+checked; you uncheck any that use a different pharmacy and press **Set pharmacy**. Each checked
 medicine then has it, as if chosen from Contacts on its own page.
 
 - Start for a result: action `com.wanderwildwood.fukuyaku.action.SET_PHARMACY`, with

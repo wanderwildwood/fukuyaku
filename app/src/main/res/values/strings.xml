@@ -169,7 +169,7 @@
     <string name="set_from">Asked by %1$s.</string>
     <string name="set_from_unknown">Asked by an app that did not give its name.</string>
     <string name="set_unknown">Nothing can be set from here, since the app that asked is not known. Ask again from the other app.</string>
-    <string name="pharmacy_set_ask">Make this the pharmacy for the medicines ticked here?</string>
+    <string name="pharmacy_set_ask">Make this the pharmacy for the medicines checked here?</string>
     <string name="pharmacy_set_none">No medicines are set up yet. Add one first; its page can choose this pharmacy from Contacts.</string>
     <string name="pharmacy_set_yes">Set pharmacy</string>
     <plurals name="pharmacy_set_done">
@@ -181,7 +181,7 @@
     <!-- Put into a new text message to the doctor; %1$s is the medicine -->
     <string name="doctor_text_body">About %1$s:</string>
     <!-- A doctor sent from Contacts: which medicines they prescribed -->
-    <string name="doctor_set_ask">Make this the doctor for the medicines ticked here?</string>
+    <string name="doctor_set_ask">Make this the doctor for the medicines checked here?</string>
     <string name="doctor_set_none">No medicines are set up yet. Add one first; its page can choose this doctor from Contacts.</string>
     <string name="doctor_set_yes">Set doctor</string>
     <plurals name="doctor_set_done">
