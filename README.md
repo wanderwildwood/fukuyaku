@@ -21,7 +21,9 @@ ships with.
 
 - **Rings at the time a dose is due**, as an alarm clock does, and gets through Do Not
   Disturb wherever alarms are let through. With the screen off the reminder fills the screen
-  over the lock screen, in large type, with the medicine's notes under it.
+  over the lock screen, in large type, with the medicine's name and notes under it, which
+  anyone holding the phone can read. **Fill the screen when a reminder rings** in Settings,
+  switched off, keeps a reminder to its notification.
 - **At set times** on every day, on some days of the week, or every few days; **every few
   hours** from a first dose; or **only when needed**, written down with one press when it is
   taken.
@@ -39,6 +41,7 @@ ships with.
   every dose by day. A dose marked late can be marked as taken at its time or just now. It can
   be shared as text, into a note or a message, or saved as a CSV file; both name each
   medicine's doctor, when it has one.
+- **Dark mode**, a switch in Settings; the app also follows the phone's own dark setting.
 - **Try a reminder**, in Settings, rings one in a minute through the same alarm a dose uses, to
   see how it looks and sounds on your phone.
 
