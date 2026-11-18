@@ -16,6 +16,8 @@ import com.wanderwildwood.fukuyaku.data.Plan
 import com.wanderwildwood.fukuyaku.data.Settings
 import com.wanderwildwood.fukuyaku.data.Status
 import com.wanderwildwood.fukuyaku.data.Store
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * The notifications: one per dose that is ringing, with Taken, Skip and Snooze on it, which
@@ -160,6 +162,17 @@ object Notifier {
             .addAction(0, context.getString(R.string.action_snooze, settings.snoozeMinutes), action(context, ActionReceiver.SNOOZE, TEST_ID.toLong()))
         if (settings.fullScreen) b.setFullScreenIntent(screen(context, TEST_ID), true)
         context.getSystemService(NotificationManager::class.java).notify(TEST_ID, b.build())
+    }
+
+    private val _testAnswered = MutableStateFlow(0)
+
+    /** Goes up by one each time the test reminder is answered from its notification. */
+    val testAnswered: StateFlow<Int> = _testAnswered
+
+    /** A button pressed on the test reminder: it goes, and an open reminder screen hears of it. */
+    fun answerTest(context: Context) {
+        cancel(context, TEST_ID.toLong())
+        _testAnswered.value = _testAnswered.value + 1
     }
 
     /** The doses whose notifications are showing now. */

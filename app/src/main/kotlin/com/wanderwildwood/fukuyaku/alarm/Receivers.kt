@@ -27,7 +27,7 @@ class ActionReceiver : BroadcastReceiver() {
         if (id < 0) return
         if (id == Notifier.TEST_ID.toLong()) {
             // The test has nothing to mark; a press only shows the button works.
-            Notifier.cancel(context, id)
+            Notifier.answerTest(context)
             return
         }
         when (intent.action) {

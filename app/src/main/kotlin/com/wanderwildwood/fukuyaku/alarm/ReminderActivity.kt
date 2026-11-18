@@ -2,6 +2,7 @@ package com.wanderwildwood.fukuyaku.alarm
 
 import com.wanderwildwood.fukuyaku.ui.DarkSelection
 import com.wanderwildwood.fukuyaku.ui.PagedColumn
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -48,28 +51,46 @@ import com.wanderwildwood.fukuyaku.ui.ArmedScope
  * at the time, so three medicines due at 08:00 are one screen, not three.
  */
 class ReminderActivity : ComponentActivity() {
+    // The screen's address, and how many times the test had been answered when it came. The
+    // screen is single-instance, so a later press of a notification arrives in onNewIntent.
+    private var opened by mutableStateOf<String?>(null)
+    private var openedAt by mutableStateOf(0)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setShowWhenLocked(true)
         setTurnScreenOn(true)
+        opening(intent)
         setContent {
             ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                 ArmedScope {
                     Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {
-                        Ringing(onDone = ::finish, opened = intent?.data?.toString())
+                        Ringing(onDone = ::finish, opened = opened, openedAt = openedAt)
                     }
                 }
             } }
         }
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        opening(intent)
+    }
+
+    private fun opening(intent: Intent?) {
+        opened = intent?.data?.toString()
+        openedAt = Notifier.testAnswered.value
+    }
 }
 
 @Composable
-private fun Ringing(onDone: () -> Unit, opened: String? = null) {
+private fun Ringing(onDone: () -> Unit, opened: String? = null, openedAt: Int = 0) {
     val context = LocalContext.current
     val version by Store.version.collectAsState()
+    val answered by Notifier.testAnswered.collectAsState()
     val settings = remember { Settings(context) }
-    val ids = remember(version) { Notifier.ringing(context) }
+    val ids = remember(version, answered) { Notifier.ringing(context) }
     val doses = remember(version) {
         val open = Store.get(context).open()
         // What the notifications say is ringing. Some phones take the notification away as the
@@ -83,8 +104,10 @@ private fun Ringing(onDone: () -> Unit, opened: String? = null) {
                 .mapNotNull { (_, those) -> those.maxByOrNull { it.due } }
         }
     }
-    // Known from the screen's own address too: the notification may already be gone.
-    val test = Notifier.TEST_ID in ids || opened == "fukuyaku://ringing/${Notifier.TEST_ID}"
+    // Known from the screen's own address too: the notification may already be gone. Once the
+    // test is answered from the shade after the screen came, the address no longer counts.
+    val test = Notifier.TEST_ID in ids ||
+        (opened == "fukuyaku://ringing/${Notifier.TEST_ID}" && answered == openedAt)
 
     // The notification stays until the dose is answered. A phone that takes it away as this
     // screen opens (Mudita's did, and the screen then closed with it) gets it back, quietly,
