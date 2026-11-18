@@ -54,7 +54,8 @@ screen; when there is none, nothing can receive the list and Share is not offere
 
 Another app can also offer a contact as a medicine's pharmacy or doctor
 (`share/SetWhoActivity.kt`). Medicine shows what is offered, with the medicines it would go to, and changes nothing until you
-press **Set pharmacy** or **Set doctor**.
+press **Set pharmacy** or **Set doctor**. When the system has no record of which app started
+the screen, the offer is shown with no Set button.
 
 ## The lock screen
 

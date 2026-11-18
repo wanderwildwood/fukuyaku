@@ -46,7 +46,8 @@ import com.wanderwildwood.fukuyaku.ui.ArmedScope
  * Actions `com.wanderwildwood.fukuyaku.action.SET_PHARMACY` ([SetPharmacyActivity]) and
  * `….SET_DOCTOR` ([SetDoctorActivity]), with [EXTRA_NAME] and [EXTRA_NUMBER] (a number is
  * needed), and [EXTRA_CONTACT], the contact's lookup URI, when there is one. Set returns
- * RESULT_OK; anything else RESULT_CANCELED.
+ * RESULT_OK; anything else RESULT_CANCELED. Started without asking for a result, the caller
+ * gives no name, and Set is not offered, as Share is not.
  */
 abstract class SetWhoActivity(
     private val title: Int,
@@ -75,10 +76,12 @@ abstract class SetWhoActivity(
             return
         }
         val medicines = Store.get(this).medicines()
-        // Named from callingPackage alone: the referrer can be set by whoever asks.
+        // Named from callingPackage alone: the referrer can be set by whoever asks. With no
+        // caller named, any app could have put this up, so nothing is set from here.
         val asker = callingPackage?.let { pkg ->
             runCatching { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() }.getOrNull() ?: pkg
         }
+        val canSet = asker != null && medicines.isNotEmpty()
         setContent {
             ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                 ArmedScope {
@@ -100,11 +103,17 @@ abstract class SetWhoActivity(
                             )
                             Spacer(Modifier.height(8.dp))
                             TextMMD(
-                                text = stringResource(if (medicines.isEmpty()) none else ask),
+                                text = stringResource(
+                                    when {
+                                        asker == null -> R.string.set_unknown
+                                        medicines.isEmpty() -> none
+                                        else -> ask
+                                    },
+                                ),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                             PagedColumn(modifier = Modifier.weight(1f).fillMaxWidth(), showCutRow = true) {
-                                medicines.forEach { m ->
+                                if (canSet) medicines.forEach { m ->
                                     item(key = m.id) {
                                         val now = current(m).takeIf { it.isNotBlank() && it != given.name.ifBlank { given.number } }
                                         CheckRow(if (now == null) m.label else m.label + " (" + now + ")", m.id in ticked) { on ->
@@ -113,7 +122,7 @@ abstract class SetWhoActivity(
                                     }
                                 }
                             }
-                            if (medicines.isNotEmpty()) {
+                            if (canSet) {
                                 ButtonMMD(
                                     onClick = {
                                         val chosen = medicines.filter { it.id in ticked }
@@ -138,7 +147,7 @@ abstract class SetWhoActivity(
                                 modifier = Modifier.fillMaxWidth().height(56.dp),
                             ) {
                                 TextMMD(
-                                    text = stringResource(if (medicines.isEmpty()) R.string.close else R.string.cancel),
+                                    text = stringResource(if (canSet) R.string.cancel else R.string.close),
                                     style = MaterialTheme.typography.bodyMedium,
                                 )
                             }

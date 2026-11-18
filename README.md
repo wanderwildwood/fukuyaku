@@ -101,12 +101,13 @@ Any app can also offer a pharmacy. Medicine shows the name and number with every
 ticked; you untick any that use a different pharmacy and press **Set pharmacy**. Each ticked
 medicine then has it, as if chosen from Contacts on its own page.
 
-- Start: action `com.wanderwildwood.fukuyaku.action.SET_PHARMACY`, with
+- Start for a result: action `com.wanderwildwood.fukuyaku.action.SET_PHARMACY`, with
   `setPackage("com.wanderwildwood.fukuyaku")` and string extras
   `com.wanderwildwood.fukuyaku.extra.NAME`, `com.wanderwildwood.fukuyaku.extra.NUMBER`
   (needed) and, optionally, `com.wanderwildwood.fukuyaku.extra.CONTACT`, the contact's
   lookup URI for "Open in Contacts".
-- On Set pharmacy: `RESULT_OK`. Otherwise `RESULT_CANCELED`.
+- On Set pharmacy: `RESULT_OK`. Otherwise `RESULT_CANCELED`. Started without asking for a
+  result, Medicine cannot tell which app asked, so it shows the offer with no Set button.
 
 A doctor comes the same way: action
 `com.wanderwildwood.fukuyaku.action.SET_DOCTOR`, the same three extras, and **Set doctor**.

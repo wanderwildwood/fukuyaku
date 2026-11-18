@@ -168,6 +168,7 @@
     <!-- A pharmacy sent from Contacts: which medicines it is for -->
     <string name="set_from">Asked by %1$s.</string>
     <string name="set_from_unknown">Asked by an app that did not give its name.</string>
+    <string name="set_unknown">Nothing can be set from here, since the app that asked is not known. Ask again from the other app.</string>
     <string name="pharmacy_set_ask">Make this the pharmacy for the medicines ticked here?</string>
     <string name="pharmacy_set_none">No medicines are set up yet. Add one first; its page can choose this pharmacy from Contacts.</string>
     <string name="pharmacy_set_yes">Set pharmacy</string>
