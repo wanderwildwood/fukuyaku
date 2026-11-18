@@ -1,6 +1,7 @@
 package com.wanderwildwood.fukuyaku.alarm
 
 import com.wanderwildwood.fukuyaku.ui.DarkSelection
+import com.wanderwildwood.fukuyaku.ui.DottedRule
 import com.wanderwildwood.fukuyaku.ui.PagedColumn
 import android.content.Intent
 import android.os.Bundle
@@ -31,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import com.mudita.mmd.ThemeMMD
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
-import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.fukuyaku.R
 import com.wanderwildwood.fukuyaku.Times
@@ -199,6 +199,6 @@ private fun RingingDose(d: Dose) {
             ) { TextMMD(text = stringResource(R.string.action_skip), style = MaterialTheme.typography.titleMedium) }
         }
         Spacer(Modifier.height(12.dp))
-        HorizontalDividerMMD()
+        DottedRule(start = 0.dp, end = 0.dp)
     }
 }
