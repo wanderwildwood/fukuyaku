@@ -112,6 +112,13 @@ object Backup {
             val medicines = (0 until ma.length()).map { i ->
                 val o = ma.getJSONObject(i)
                 val schedule = Schedule.decode(o.getString("schedule")) ?: throw IllegalArgumentException("schedule")
+                // Only what the medicine's page can set: a gap of millions of days would be walked
+                // a day at a time on every sync, and the app would hang each time it opened.
+                when (schedule) {
+                    is Schedule.EveryHours -> require(schedule.hours in 1..168)
+                    is Schedule.AtTimes -> (schedule.days as? Days.EveryN)?.let { require(it.n in 1..365) }
+                    is Schedule.AsNeeded -> Unit
+                }
                 val name = o.getString("name")
                 require(name.isNotBlank())
                 Medicine(

@@ -109,6 +109,19 @@ class BackupTest {
     }
 
     @Test
+    fun aScheduleThePageCannotSetIsDamaged() {
+        val o = JSONObject(file())
+        o.getJSONArray("medicines").getJSONObject(3).put("schedule", "T|07:00|N2000000000@2026-03-01")
+        refused(o.toString(), Kind.DAMAGED)
+        val p = JSONObject(file())
+        p.getJSONArray("medicines").getJSONObject(2).put("schedule", "H|0|2026-01-01T09:00")
+        refused(p.toString(), Kind.DAMAGED)
+        val q = JSONObject(file())
+        q.getJSONArray("medicines").getJSONObject(2).put("schedule", "H|169|2026-01-01T09:00")
+        refused(q.toString(), Kind.DAMAGED)
+    }
+
+    @Test
     fun aMissingFieldIsDamaged() {
         val o = JSONObject(file())
         o.getJSONArray("medicines").getJSONObject(0).remove("name")
