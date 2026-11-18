@@ -28,7 +28,7 @@ ships with.
   hours** from a first dose; or **only when needed**, written down with one press when it is
   taken.
 - **Rings again** if a dose is not marked: after 30 minutes, up to three times, unless the next
-  dose is due first. Both can be changed, or switched off.
+  dose is due first. The wait can be 15, 30 or 60 minutes, or ringing again switched off.
 - **Never loses a dose quietly.** Every dose that comes due goes into the log, marked or not.
   If the phone was off or the app was stopped when a dose was due, the log says the reminder
   did not ring, and the first screen says when the app was stopped.
