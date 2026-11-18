@@ -159,11 +159,17 @@ fun EditScreen(id: Long, onDone: () -> Unit, leave: Int = 0) {
     BackHandler { back() }
     // Another medicine asked for from outside (a refill notice, a calendar event): this page is
     // left as Back leaves it. Only a new ask counts, not one made before this page opened.
+    // An ask from outside never takes the leave-without-saving path, however often it comes:
+    // only a Back press here throws away what was typed.
     var heard by rememberSaveable(id) { mutableIntStateOf(leave) }
     LaunchedEffect(leave) {
         if (leave != heard) {
             heard = leave
-            back()
+            when {
+                d == start -> onDone()
+                save() -> onDone()
+                else -> leaving = true
+            }
         }
     }
 
