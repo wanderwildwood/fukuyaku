@@ -314,7 +314,7 @@
     <string name="restore_damaged">That backup is damaged, so it was not used. Nothing was changed.</string>
     <string name="restore_unreadable">That file could not be read. Nothing was changed.</string>
     <string name="settings_clear_log">Clear the log</string>
-    <string name="settings_clear_log_armed">Clear — every dose in the log goes; tap again</string>
+    <string name="settings_clear_log_armed">Clear — every dose up to now goes; tap again</string>
     <plurals name="minutes">
         <item quantity="one">%1$s minute</item>
         <item quantity="other">%1$s minutes</item>

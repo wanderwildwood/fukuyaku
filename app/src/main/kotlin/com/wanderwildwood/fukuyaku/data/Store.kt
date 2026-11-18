@@ -209,9 +209,12 @@ class Store private constructor(context: Context) :
     fun lastTaken(medicineId: Long): Dose? =
         doses("medicine_id = ? AND status = 1", arrayOf(medicineId.toString()), "marked DESC LIMIT 1").firstOrNull()
 
-    /** Forgets every dose, and leaves the medicines as they are. */
-    fun clearLog() {
-        writableDatabase.delete("dose", null, null)
+    /**
+     * Forgets every dose up to [now], and leaves the medicines as they are. A dose taken early
+     * (marked, and due later than now) stays: it is all that stops that time ringing again.
+     */
+    fun clearLog(now: Long = System.currentTimeMillis()) {
+        writableDatabase.delete("dose", "due <= ? OR status = 0", arrayOf(now.toString()))
         changed()
     }
 
