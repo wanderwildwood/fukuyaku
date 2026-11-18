@@ -132,7 +132,7 @@ fun EditScreen(id: Long, onDone: () -> Unit, leave: Int = 0) {
     // so Datebook put on or taken off meanwhile is seen.
     var datebook by remember { mutableStateOf(false) }
     LifecycleResumeEffect(Unit) {
-        datebook = Datebook.takes(Datebook.answering(context.packageManager))
+        datebook = Datebook.isThere(context)
         onPauseOrDispose { }
     }
 
