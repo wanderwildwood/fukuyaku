@@ -159,6 +159,19 @@ class Store private constructor(context: Context) :
                 db.insertOrThrow("medicine", null, v)
             }
             for (d in b.doses) db.insertOrThrow("dose", null, doseValues(d))
+            // The log may hold doses of a medicine deleted before the backup was made. On a new
+            // phone the next id would follow only the medicines restored, and a medicine added
+            // then could take a deleted one's id, and with it that one's history. Ids go on
+            // from past every one the backup names.
+            val top = maxOf(b.medicines.maxOfOrNull { it.id } ?: 0L, b.doses.maxOfOrNull { it.medicineId } ?: 0L)
+            val seq = db.rawQuery("SELECT seq FROM sqlite_sequence WHERE name = 'medicine'", null).use { c ->
+                if (c.moveToFirst()) c.getLong(0) else null
+            }
+            if (seq == null) {
+                db.execSQL("INSERT INTO sqlite_sequence (name, seq) VALUES ('medicine', ?)", arrayOf<Any>(top))
+            } else if (seq < top) {
+                db.execSQL("UPDATE sqlite_sequence SET seq = ? WHERE name = 'medicine'", arrayOf<Any>(top))
+            }
             db.setTransactionSuccessful()
         } finally {
             db.endTransaction()
