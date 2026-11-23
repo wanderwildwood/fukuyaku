@@ -88,7 +88,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
     val fullScreen = remember(v) { s.fullScreen }
     val glance = remember(v) { s.onLockScreen }
     // The switch only means something with Glance on the phone; left showing while on, so it can be turned off.
-    val glanceInstalled = remember {
+    val glanceHere = remember {
         context.packageManager.getLaunchIntentForPackage(GlanceProvider.READER) != null
     }
     val alarmClock = remember(v) { s.asAlarmClock }
@@ -156,7 +156,7 @@ fun SettingsScreen(onBack: () -> Unit, onAbout: () -> Unit) {
                     }
                 }
             }
-            if (glanceInstalled || glance) item(key = "glance") {
+            if (glanceHere || glance) item(key = "glance") {
                 SwitchRow(stringResource(R.string.settings_glance), glance, note = stringResource(R.string.settings_glance_note)) {
                     s.onLockScreen = it
                     GlanceProvider.changed(context)
