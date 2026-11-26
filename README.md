@@ -14,8 +14,8 @@ ships with.
 
 | | |
 |---|---|
-| ![Today's doses, one taken and one not yet](screenshots/1-today.png) | ![The medicines, with what is left of each](screenshots/2-medicines.png) |
-| ![A medicine's page: how long what is left lasts, the pharmacy](screenshots/3-medicine.png) | ![The log, with the last two weeks](screenshots/4-log.png) |
+| ![Today's doses, taken and still to come](screenshots/1-today.png) | ![The medicines, and how often each is due](screenshots/2-medicines.png) |
+| ![A dose due: Taken or Skip](screenshots/3-due.png) | ![The log: how often each was taken, to share or save](screenshots/4-log.png) |
 
 ## What it does
 
